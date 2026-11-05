@@ -177,11 +177,11 @@ typedef union Vec4 {
 
 static Vec2 V2Neg(Vec2 v) { return (Vec2){-v.x, -v.y}; }
 
-static Vec2 V2Add(Vec2 v1, Vec2 v2) { return (Vec2){0.f, 0.f}; } // TODO(student)
+static Vec2 V2Add(Vec2 v1, Vec2 v2) { return (Vec2){v1.x + v2.x, v1.y + v2.y}; } // TODO(student)
 static Vec2 V2Sub(Vec2 v1, Vec2 v2) { return (Vec2){v1.x - v2.x, v1.y - v2.y}; }
 
-static Vec2 V2MulS(Vec2 v, float s) { return (Vec2){v.x*s, v.y*s}; }
-static Vec2 V2DivS(Vec2 v, float s) { return (Vec2){0.f, 0.f}; } // TODO(student)
+static Vec2 V2MulS(Vec2 v, float s) { return (Vec2){v.x * s, v.y * s}; }
+static Vec2 V2DivS(Vec2 v, float s) { return (Vec2){v.x / s, v.y / s}; } // TODO(student)
 
 static Vec2 V2Mul(Vec2 v1, Vec2 v2) { return (Vec2){v1.x*v2.x, v1.y*v2.y}; }
 static Vec2 V2Div(Vec2 v1, Vec2 v2) { return (Vec2){v1.x/v2.x, v1.y/v2.y}; }
@@ -195,18 +195,22 @@ static Vec2 V2Lerp(Vec2 a, float t, Vec2 b) {
 static float V2Dot(Vec2 v1, Vec2 v2) {
     float result;
     // TODO(student)
+    result = v1.x * v2.x + v1.y * v2.y;
     return result;
 }
 
 static float V2Length(Vec2 v) {
     float result;
     // TODO(student)
+    result = sqrt(v.x * v.x + v.y * v.y);
     return result;
 }
 
 static Vec2 V2Normalize(Vec2 v) {
-    Vec2 result = {0.f, 0.f};
     // TODO(student)
+    float len = V2Length(v);
+    if(len < EPSILON){return v;}
+    Vec2 result = {v.x / len, v.y / len};
     return result;
 }
 
@@ -356,6 +360,8 @@ static Mat2 M2Neg(Mat2 m) {
 static Mat2 M2Add(Mat2 m1, Mat2 m2) {
     Mat2 result = {};
     // TODO(student)
+    result.c0 = V2Add(m1.c0, m2.c0);
+    result.c1 = V2Add(m1.c1, m2.c1);
     return result;
 }
 
@@ -381,7 +387,7 @@ static Mat2 M2DivS(Mat2 m, float s) {
 }
 
 static Vec2 M2MulV2(Mat2 m, Vec2 v) {
-    Vec2 result = {};
+    Vec2 result = {m.s00 * v.x + m.s10 * v.y, m.s10 * v.x + m.s11 + v.y};
     // TODO(student)
     return result;
 }
@@ -389,6 +395,8 @@ static Vec2 M2MulV2(Mat2 m, Vec2 v) {
 static Mat2 M2MulM2(Mat2 m1, Mat2 m2) {
     Mat2 result = {};
     // TODO(student)
+    result.c0 = M2MulV2(m1, m2.c0);
+    result.c1 = M2MulV2(m1, m2.c1);
     return result;
 }
 
@@ -397,7 +405,7 @@ static bool M2Eq(Mat2 m1, Mat2 m2) {
 }
 
 static Mat2 M2Transpose(Mat2 m) {
-    Mat2 result = {};
+    Mat2 result = {m.s00, m.s10, m.s01, m.s11};
     // TODO(student)
     return result;
 }
@@ -412,19 +420,22 @@ static Mat2 M2Diag(float s00, float s11)  {
 }
 
 static float M2Det(Mat2 m) {
-    float result = {};
+    float result = m.s00 * m.s11 - m.s10 * m.s01;
     // TODO(student)
     return result;
 }
 
 static Mat2 M2Rotate(float theta) {
-    Mat2 result = {};
+    float c = cos(theta);
+    float s = sin(theta);
+    Mat2 result = {c, s, -s, c};
     // TODO(student)
     return result;
 }
 
 static Mat2 M2Inverse(Mat2 m) {
-    Mat2 result = {};
+    Mat2 result = {m.s11, -m.s01, -m.s10, m.s00};
+    result = M2DivS(result, M2Det(m));
     // TODO(student)
     return result;
 }
