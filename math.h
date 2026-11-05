@@ -212,31 +212,27 @@ static Vec2 V2Normalize(Vec2 v) {
 
 static Vec3 V3Neg(Vec3 v) { return (Vec3){-v.x, -v.y, -v.z}; }
 
-static Vec3 V3Add(Vec3 v1, Vec3 v2) { return (Vec3){0.f, 0.f, 0.f}; } // TODO(student)
+static Vec3 V3Add(Vec3 v1, Vec3 v2) { return (Vec3){v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
 static Vec3 V3Sub(Vec3 v1, Vec3 v2) { return (Vec3){v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}; }
 
-static Vec3 V3MulS(Vec3 v, float s) { return (Vec3){0.f, 0.f, 0.f}; } // TODO(student)
-static Vec3 V3DivS(Vec3 v, float s) { return (Vec3){0.f, 0.f, 0.f}; } // TODO(student)
+static Vec3 V3MulS(Vec3 v, float s) { return (Vec3){v.x * s, v.y * s, v.z * s}; }
+static Vec3 V3DivS(Vec3 v, float s) { return (Vec3){v.x / s, v.y / s, v.z / s}; }
 
-static Vec3 V3Mul(Vec3 v1, Vec3 v2) { return (Vec3){0.f, 0.f}; } // TODO(student)
-static Vec3 V3Div(Vec3 v1, Vec3 v2) { return (Vec3){0.f, 0.f}; } // TODO(student)
+static Vec3 V3Mul(Vec3 v1, Vec3 v2) { return (Vec3){v1.x * v2.x, v1.y * v2.y, v1.z * v2.z}; }
+static Vec3 V3Div(Vec3 v1, Vec3 v2) { return (Vec3){v1.x / v2.x, v1.y / v2.y, v1.z / v2.z}; }
 
-static bool V3Eq(Vec3 v1, Vec3 v2) { return false; } // TODO(student)
+static bool V3Eq(Vec3 v1, Vec3 v2) { return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z; }
 
 static Vec3 V3Lerp(Vec3 a, float t, Vec3 b) {
     return V3Add(V3MulS(a, (1.f - t)), V3MulS(b, t));
 }
 
 static float V3Dot(Vec3 v1, Vec3 v2) {
-    float result = 0.f;
-    // TODO(student)
-    return result;
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
 static float V3LengthSquared(Vec3 v) {
-    float result = 0.f;
-    // TODO(student)
-    return result;
+    return v.x * v.x + v.y * v.y + v.z * v.z;
 }
 
 static float V3Length(Vec3 v) {
@@ -257,7 +253,11 @@ static Vec3 V3Normalize(Vec3 v) {
 
 static Vec3 V3Cross(Vec3 v1, Vec3 v2) {
     Vec3 result = {};
-    // TODO(student)
+
+    result.x = v1.y * v2.z - v1.z * v2.y;
+    result.y = v1.z * v2.x - v1.x * v2.z;
+    result.z = v1.x * v2.y - v1.y * v2.x;
+
     return result;
 }
 
