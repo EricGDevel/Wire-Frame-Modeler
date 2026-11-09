@@ -140,13 +140,13 @@ if (guiLocked) GuiLock(); \
 
 #define BOX_FLOAT_CLAMP0(x, left, top, tip) \
 do { \
-PUSH_FLOAT_BOX(x, left, top, tip); \
+BOX_FLOAT(x, left, top, tip); \
 *x = MAX(*x, 0.f); \
 } while(0)
 
 #define BOX_FLOAT_CLAMP01(x, left, top, tip) \
 do { \
-PUSH_FLOAT_BOX(x, left, top, tip); \
+BOX_FLOAT(x, left, top, tip); \
 *x = CLAMP(*x, 0.f, 1.f); \
 } while(0)
 
@@ -178,7 +178,7 @@ if (guiLocked) GuiLock(); \
 
 #define BOX_INT_CLAMP(x, min, max, left, top, tip) \
 do { \
-PUSH_INT_BOX(x, left, top, tip); \
+BOX_INT(x, left, top, tip); \
 *x = CLAMP(*x, min, max); \
 } while(0)
 
@@ -410,12 +410,12 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
                 activeModel = &scene->models[scene->activeModelIndex];
                 lock = false;
             } else {
-                // If there's no value active model selected, we want to draw the same UI but locked
+                // If there's no active model selected, we want to draw the same UI but locked
                 // so we have a dummy model to prevent illegal pointer access when drawing the GUI
                 activeModel = &dummyModel;
                 
                 // We want to lock only if the gui is not already locked so we don't unlock it later
-                // if it was intended to stay lock (for example if the file dialog is open)
+                // if it was intended to stay locked (for example if the file dialog is open)
                 lock = !GuiIsLocked();
             }
             if (lock) GuiLock();
@@ -559,9 +559,8 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
         }
     }
     
-    //
     // Global GUI elements that are drawn after all the other stuff (and maybe on top of it).
-    // 
+    // Those elements should also be always responsive, so we always unlock before drawing it.
     GuiUnlock();
     if(tooltip != NULL) {
         Vector2 mouse = GetMousePosition();
@@ -600,8 +599,6 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
         }
     }
     
-    // File dialog drawing should be last as it may lock other UI elements.
-    // It should also be always responsive, so we unlock before drawing it.
     {
         if (IsKeyPressed(KEY_ESCAPE)) {
             fileDialogState.windowActive = false;
