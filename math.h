@@ -318,8 +318,8 @@ typedef union Mat2 {
         float s10, s11;
     };
     
-    struct { Vec2 c0, c1; };
-    Vec2 columns[2];
+    struct { Vec2 r0, r1; };
+    Vec2 rows[2];
     Vec4 value;
 } Mat2;
 
@@ -330,8 +330,8 @@ typedef union Mat3 {
         float s20, s21, s22;
     };
     
-    struct { Vec3 c0, c1, c2; };
-    Vec3 columns[3];
+    struct { Vec3 r0, r1, r2; };
+    Vec3 rows[3];
 } Mat3;
 
 typedef union Mat4 {
@@ -342,8 +342,8 @@ typedef union Mat4 {
         float s30, s31, s32, s33;
     };
     
-    struct { Vec4 c0, c1, c2, c3; };
-    Vec4 columns[4];
+    struct { Vec4 r0, r1, r2, r3; };
+    Vec4 rows[4];
 } Mat4;
 
 //
@@ -352,8 +352,8 @@ typedef union Mat4 {
 
 static Mat2 M2Neg(Mat2 m) {
     Mat2 result;
-    result.c0 = V2Neg(m.c0);
-    result.c1 = V2Neg(m.c1);
+    result.r0 = V2Neg(m.r0);
+    result.r1 = V2Neg(m.r1);
     return result;
 }
 
@@ -367,22 +367,22 @@ static Mat2 M2Add(Mat2 m1, Mat2 m2) {
 
 static Mat2 M2Sub(Mat2 m1, Mat2 m2) {
     Mat2 result;
-    result.c0 = V2Sub(m1.c0, m2.c0);
-    result.c1 = V2Sub(m1.c1, m2.c1);
+    result.r0 = V2Sub(m1.r0, m2.r0);
+    result.r1 = V2Sub(m1.r1, m2.r1);
     return result;
 }
 
 static Mat2 M2MulS(Mat2 m, float s) {
     Mat2 result;
-    result.c0 = V2MulS(m.c0, s);
-    result.c1 = V2MulS(m.c1, s);
+    result.r0 = V2MulS(m.r0, s);
+    result.r1 = V2MulS(m.r1, s);
     return result;
 }
 
 static Mat2 M2DivS(Mat2 m, float s) {
     Mat2 result;
-    result.c0 = V2DivS(m.c0, s);
-    result.c1 = V2DivS(m.c1, s);
+    result.r0 = V2DivS(m.r0, s);
+    result.r1 = V2DivS(m.r1, s);
     return result;
 }
 
@@ -401,7 +401,7 @@ static Mat2 M2MulM2(Mat2 m1, Mat2 m2) {
 }
 
 static bool M2Eq(Mat2 m1, Mat2 m2) {
-    return V2Eq(m1.c0, m2.c0) && V2Eq(m1.c1, m2.c1);
+    return V2Eq(m1.r0, m2.r0) && V2Eq(m1.r1, m2.r1);
 }
 
 static Mat2 M2Transpose(Mat2 m) {
@@ -442,9 +442,9 @@ static Mat2 M2Inverse(Mat2 m) {
 
 static Mat3 M3Neg(Mat3 m) {
     Mat3 result;
-    result.c0 = V3Neg(m.c0);
-    result.c1 = V3Neg(m.c1);
-    result.c2 = V3Neg(m.c2);
+    result.r0 = V3Neg(m.r0);
+    result.r1 = V3Neg(m.r1);
+    result.r2 = V3Neg(m.r2);
     return result;
 }
 
@@ -462,17 +462,17 @@ static Mat3 M3Sub(Mat3 m1, Mat3 m2) {
 
 static Mat3 M3MulS(Mat3 m, float s) {
     Mat3 result;
-    result.c0 = V3MulS(m.c0, s);
-    result.c1 = V3MulS(m.c1, s);
-    result.c2 = V3MulS(m.c2, s);
+    result.r0 = V3MulS(m.r0, s);
+    result.r1 = V3MulS(m.r1, s);
+    result.r2 = V3MulS(m.r2, s);
     return result;
 }
 
 static Mat3 M3DivS(Mat3 m, float s) {
     Mat3 result;
-    result.c0 = V3DivS(m.c0, s);
-    result.c1 = V3DivS(m.c1, s);
-    result.c2 = V3DivS(m.c2, s);
+    result.r0 = V3DivS(m.r0, s);
+    result.r1 = V3DivS(m.r1, s);
+    result.r2 = V3DivS(m.r2, s);
     return result;
 }
 
@@ -489,7 +489,7 @@ static Mat3 M3MulM3(Mat3 m1, Mat3 m2) {
 }
 
 static bool M3Eq(Mat3 m1, Mat3 m2) {
-    return V3Eq(m1.c0, m2.c0) && V3Eq(m1.c1, m2.c1) && V3Eq(m1.c2, m2.c2);
+    return V3Eq(m1.r0, m2.r0) && V3Eq(m1.r1, m2.r1) && V3Eq(m1.r2, m2.r2);
 }
 
 static Mat3 M3Transpose(Mat3 m) {
@@ -550,46 +550,46 @@ static Mat3 M3Inverse(Mat3 m) {
 
 static Mat4 M4Neg(Mat4 m) {
     Mat4 result;
-    result.c0 = V4Neg(m.c0);
-    result.c1 = V4Neg(m.c1);
-    result.c2 = V4Neg(m.c2);
-    result.c3 = V4Neg(m.c3);
+    result.r0 = V4Neg(m.r0);
+    result.r1 = V4Neg(m.r1);
+    result.r2 = V4Neg(m.r2);
+    result.r3 = V4Neg(m.r3);
     return result;
 }
 
 static Mat4 M4Add(Mat4 m1, Mat4 m2) {
     Mat4 result;
-    result.c0 = V4Add(m1.c0, m2.c0);
-    result.c1 = V4Add(m1.c1, m2.c1);
-    result.c2 = V4Add(m1.c2, m2.c2);
-    result.c3 = V4Add(m1.c3, m2.c3);
+    result.r0 = V4Add(m1.r0, m2.r0);
+    result.r1 = V4Add(m1.r1, m2.r1);
+    result.r2 = V4Add(m1.r2, m2.r2);
+    result.r3 = V4Add(m1.r3, m2.r3);
     return result;
 }
 
 static Mat4 M4Sub(Mat4 m1, Mat4 m2) {
     Mat4 result;
-    result.c0 = V4Sub(m1.c0, m2.c0);
-    result.c1 = V4Sub(m1.c1, m2.c1);
-    result.c2 = V4Sub(m1.c2, m2.c2);
-    result.c3 = V4Sub(m1.c3, m2.c3);
+    result.r0 = V4Sub(m1.r0, m2.r0);
+    result.r1 = V4Sub(m1.r1, m2.r1);
+    result.r2 = V4Sub(m1.r2, m2.r2);
+    result.r3 = V4Sub(m1.r3, m2.r3);
     return result;
 }
 
 static Mat4 M4MulS(Mat4 m, float s) {
     Mat4 result;
-    result.c0 = V4MulS(m.c0, s);
-    result.c1 = V4MulS(m.c1, s);
-    result.c2 = V4MulS(m.c2, s);
-    result.c3 = V4MulS(m.c3, s);
+    result.r0 = V4MulS(m.r0, s);
+    result.r1 = V4MulS(m.r1, s);
+    result.r2 = V4MulS(m.r2, s);
+    result.r3 = V4MulS(m.r3, s);
     return result;
 }
 
 static Mat4 M4DivS(Mat4 m, float s) {
     Mat4 result;
-    result.c0 = V4DivS(m.c0, s);
-    result.c1 = V4DivS(m.c1, s);
-    result.c2 = V4DivS(m.c2, s);
-    result.c3 = V4DivS(m.c3, s);
+    result.r0 = V4DivS(m.r0, s);
+    result.r1 = V4DivS(m.r1, s);
+    result.r2 = V4DivS(m.r2, s);
+    result.r3 = V4DivS(m.r3, s);
     return result;
 }
 
@@ -613,7 +613,7 @@ static Mat4 M4MulM4(Mat4 m1, Mat4 m2) {
 }
 
 static bool M4Eq(Mat4 m1, Mat4 m2) {
-    return V4Eq(m1.c0, m2.c0) && V4Eq(m1.c1, m2.c1) && V4Eq(m1.c2, m2.c2) && V4Eq(m1.c3, m2.c3);
+    return V4Eq(m1.r0, m2.r0) && V4Eq(m1.r1, m2.r1) && V4Eq(m1.r2, m2.r2) && V4Eq(m1.r3, m2.r3);
 }
 
 static Mat4 M4Transpose(Mat4 m) {
