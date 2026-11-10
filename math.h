@@ -358,10 +358,9 @@ static Mat2 M2Neg(Mat2 m) {
 }
 
 static Mat2 M2Add(Mat2 m1, Mat2 m2) {
-    Mat2 result = {};
-    // TODO(student)
-    result.c0 = V2Add(m1.c0, m2.c0);
-    result.c1 = V2Add(m1.c1, m2.c1);
+    Mat2 result;
+    result.r0 = V2Add(m1.r0, m2.r0);
+    result.r1 = V2Add(m1.r1, m2.r1);
     return result;
 }
 
@@ -387,16 +386,14 @@ static Mat2 M2DivS(Mat2 m, float s) {
 }
 
 static Vec2 M2MulV2(Mat2 m, Vec2 v) {
-    Vec2 result = {m.s00 * v.x + m.s10 * v.y, m.s10 * v.x + m.s11 + v.y};
-    // TODO(student)
+    Vec2 result = {m.s00 * v.x + m.s01 * v.y, m.s10 * v.x + m.s11 + v.y};
     return result;
 }
 
 static Mat2 M2MulM2(Mat2 m1, Mat2 m2) {
     Mat2 result = {};
-    // TODO(student)
-    result.c0 = M2MulV2(m1, m2.c0);
-    result.c1 = M2MulV2(m1, m2.c1);
+    result.r0 = M2MulV2(m1, m2.r0);
+    result.r1 = M2MulV2(m1, m2.r1);
     return result;
 }
 
@@ -406,7 +403,6 @@ static bool M2Eq(Mat2 m1, Mat2 m2) {
 
 static Mat2 M2Transpose(Mat2 m) {
     Mat2 result = {m.s00, m.s10, m.s01, m.s11};
-    // TODO(student)
     return result;
 }
 
@@ -421,14 +417,13 @@ static Mat2 M2Diag(float s00, float s11)  {
 
 static float M2Det(Mat2 m) {
     float result = m.s00 * m.s11 - m.s10 * m.s01;
-    // TODO(student)
     return result;
 }
 
 static Mat2 M2Rotate(float theta) {
     float c = cos(theta);
     float s = sin(theta);
-    Mat2 result = {c, s, -s, c};
+    Mat2 result = {c, -s, s, c};
     // TODO(student)
     return result;
 }
@@ -436,7 +431,6 @@ static Mat2 M2Rotate(float theta) {
 static Mat2 M2Inverse(Mat2 m) {
     Mat2 result = {m.s11, -m.s01, -m.s10, m.s00};
     result = M2DivS(result, M2Det(m));
-    // TODO(student)
     return result;
 }
 
