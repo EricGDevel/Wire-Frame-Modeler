@@ -177,11 +177,11 @@ typedef union Vec4 {
 
 static Vec2 V2Neg(Vec2 v) { return (Vec2){-v.x, -v.y}; }
 
-static Vec2 V2Add(Vec2 v1, Vec2 v2) { return (Vec2){v1.x + v2.x, v1.y + v2.y}; } // TODO(student)
+static Vec2 V2Add(Vec2 v1, Vec2 v2) { return (Vec2){v1.x + v2.x, v1.y + v2.y}; }
 static Vec2 V2Sub(Vec2 v1, Vec2 v2) { return (Vec2){v1.x - v2.x, v1.y - v2.y}; }
 
 static Vec2 V2MulS(Vec2 v, float s) { return (Vec2){v.x * s, v.y * s}; }
-static Vec2 V2DivS(Vec2 v, float s) { return (Vec2){v.x / s, v.y / s}; } // TODO(student)
+static Vec2 V2DivS(Vec2 v, float s) { return (Vec2){v.x / s, v.y / s}; }
 
 static Vec2 V2Mul(Vec2 v1, Vec2 v2) { return (Vec2){v1.x*v2.x, v1.y*v2.y}; }
 static Vec2 V2Div(Vec2 v1, Vec2 v2) { return (Vec2){v1.x/v2.x, v1.y/v2.y}; }
@@ -194,20 +194,17 @@ static Vec2 V2Lerp(Vec2 a, float t, Vec2 b) {
 
 static float V2Dot(Vec2 v1, Vec2 v2) {
     float result;
-    // TODO(student)
     result = v1.x * v2.x + v1.y * v2.y;
     return result;
 }
 
 static float V2Length(Vec2 v) {
     float result;
-    // TODO(student)
     result = sqrt(v.x * v.x + v.y * v.y);
     return result;
 }
 
 static Vec2 V2Normalize(Vec2 v) {
-    // TODO(student)
     float len = V2Length(v);
     if(len < EPSILON){return v;}
     Vec2 result = {v.x / len, v.y / len};
@@ -424,7 +421,6 @@ static Mat2 M2Rotate(float theta) {
     float c = cos(theta);
     float s = sin(theta);
     Mat2 result = {c, -s, s, c};
-    // TODO(student)
     return result;
 }
 
