@@ -1,6 +1,9 @@
 #if !defined(MATH_HEADER)
 #define MATH_HEADER
 
+#include <math.h>
+#include <stdbool.h>
+
 #define EPSILON 1e-8f
 #define MIN(a, b) (((a) > (b)) ? (b) : (a))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
@@ -213,31 +216,27 @@ static Vec2 V2Normalize(Vec2 v) {
 
 static Vec3 V3Neg(Vec3 v) { return (Vec3){-v.x, -v.y, -v.z}; }
 
-static Vec3 V3Add(Vec3 v1, Vec3 v2) { return (Vec3){0.f, 0.f, 0.f}; } // TODO(student)
+static Vec3 V3Add(Vec3 v1, Vec3 v2) { return (Vec3){v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
 static Vec3 V3Sub(Vec3 v1, Vec3 v2) { return (Vec3){v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}; }
 
-static Vec3 V3MulS(Vec3 v, float s) { return (Vec3){0.f, 0.f, 0.f}; } // TODO(student)
-static Vec3 V3DivS(Vec3 v, float s) { return (Vec3){0.f, 0.f, 0.f}; } // TODO(student)
+static Vec3 V3MulS(Vec3 v, float s) { return (Vec3){v.x * s, v.y * s, v.z * s}; }
+static Vec3 V3DivS(Vec3 v, float s) { return (Vec3){v.x / s, v.y / s, v.z / s}; }
 
-static Vec3 V3Mul(Vec3 v1, Vec3 v2) { return (Vec3){0.f, 0.f}; } // TODO(student)
-static Vec3 V3Div(Vec3 v1, Vec3 v2) { return (Vec3){0.f, 0.f}; } // TODO(student)
+static Vec3 V3Mul(Vec3 v1, Vec3 v2) { return (Vec3){v1.x * v2.x, v1.y * v2.y, v1.z * v2.z}; }
+static Vec3 V3Div(Vec3 v1, Vec3 v2) { return (Vec3){v1.x / v2.x, v1.y / v2.y, v1.z / v2.z}; }
 
-static bool V3Eq(Vec3 v1, Vec3 v2) { return false; } // TODO(student)
+static bool V3Eq(Vec3 v1, Vec3 v2) { return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z; }
 
 static Vec3 V3Lerp(Vec3 a, float t, Vec3 b) {
     return V3Add(V3MulS(a, (1.f - t)), V3MulS(b, t));
 }
 
 static float V3Dot(Vec3 v1, Vec3 v2) {
-    float result = 0.f;
-    // TODO(student)
-    return result;
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
 static float V3LengthSquared(Vec3 v) {
-    float result = 0.f;
-    // TODO(student)
-    return result;
+    return v.x * v.x + v.y * v.y + v.z * v.z;
 }
 
 static float V3Length(Vec3 v) {
@@ -258,7 +257,11 @@ static Vec3 V3Normalize(Vec3 v) {
 
 static Vec3 V3Cross(Vec3 v1, Vec3 v2) {
     Vec3 result = {};
-    // TODO(student)
+
+    result.x = v1.y * v2.z - v1.z * v2.y;
+    result.y = v1.z * v2.x - v1.x * v2.z;
+    result.z = v1.x * v2.y - v1.y * v2.x;
+
     return result;
 }
 
@@ -430,6 +433,11 @@ static Mat2 M2Inverse(Mat2 m) {
     return result;
 }
 
+
+static Vec3 M3GetCol(Mat3 m, int i) {
+    return (Vec3){m.r0.values[i], m.r1.values[i], m.r2.values[i]};
+}
+
 static Mat3 M3Neg(Mat3 m) {
     Mat3 result;
     result.r0 = V3Neg(m.r0);
@@ -440,13 +448,17 @@ static Mat3 M3Neg(Mat3 m) {
 
 static Mat3 M3Add(Mat3 m1, Mat3 m2) {
     Mat3 result = {};
-    // TODO(student)
+    for (int i = 0; i < 3; i++) {
+        result.rows[i] = V3Add(m1.rows[i], m2.rows[i]);
+    }
     return result;
 }
 
 static Mat3 M3Sub(Mat3 m1, Mat3 m2) {
     Mat3 result = {};
-    // TODO(student)
+    for (int i = 0; i < 3; i++) {
+        result.rows[i] = V3Sub(m1.rows[i], m2.rows[i]);
+    }
     return result;
 }
 
@@ -468,15 +480,29 @@ static Mat3 M3DivS(Mat3 m, float s) {
 
 static Vec3 M3MulV3(Mat3 m, Vec3 v) {
     Vec3 result = {};
-    // TODO(student)
+    for (int i = 0; i < 3; i++) {
+        result.values[i] = V3Dot(m.rows[i], v);
+    }
+    return result;
+}
+
+// Multiply (1x3) * (3x3) -> (1*3)
+static Vec3 M3MulRV3(Vec3 v, Mat3 m) {
+    Vec3 result = {};
+    for (int i = 0; i < 3; i++) {
+        result.values[i] = V3Dot(v, M3GetCol(m, i));
+    }
     return result;
 }
 
 static Mat3 M3MulM3(Mat3 m1, Mat3 m2) {
     Mat3 result = {};
-    // TODO(student)
+    for (int i = 0; i < 3; i++) {
+        result.rows[i] = M3MulRV3(m1.rows[i], m2);
+    }
     return result;
 }
+
 
 static bool M3Eq(Mat3 m1, Mat3 m2) {
     return V3Eq(m1.r0, m2.r0) && V3Eq(m1.r1, m2.r1) && V3Eq(m1.r2, m2.r2);
@@ -484,7 +510,9 @@ static bool M3Eq(Mat3 m1, Mat3 m2) {
 
 static Mat3 M3Transpose(Mat3 m) {
     Mat3 result = {};
-    // TODO(student)
+    for (int i = 0; i < 3; i++) {
+        result.rows[i] = M3GetCol(m, i);
+    }
     return result;
 }
 
@@ -513,29 +541,67 @@ static Mat3 M3DiagS(float s) {
 
 static float M3Det(Mat3 m) {
     float result = 0.f;
-    // TODO(student)
+    result += m.s00 * (m.s11 * m.s22 - m.s21 * m.s12);
+    result -= m.s10 * (m.s01 * m.s22 - m.s21 * m.s02);
+    result += m.s20 * (m.s01 * m.s12 - m.s11 * m.s02);
     return result;
 }
 
 // Rotation of angle theta around a 3D axis
+// https://en.wikipedia.org/wiki/Rodrigues'_rotation_formula#Matrix_notation
+// https://mathworld.wolfram.com/RodriguesRotationFormula.html
 static Mat3 M3Rotate(float theta, Vec3 axis) {
-    Mat3 result = {};
-    // TODO(student)
-    return result;
+    Vec3 norm_axis = V3Normalize(axis);
+    float c_theta = cosf(theta), s_theta = sinf(theta);
+    Mat3 identity = (Mat3){1, 0, 0, 0, 1, 0, 0, 0, 1};
+
+    // Cross product matrix multiplied with by axis of rotation
+    Mat3 cross_matrix = (Mat3){
+        .r0 = {0, -norm_axis.z, norm_axis.y},
+        .r1 = {norm_axis.z, 0, -norm_axis.x},
+        .r2 = {-norm_axis.y, norm_axis.x, 0},
+    };
+
+    Mat3 result = M3MulS(cross_matrix, s_theta);
+    Mat3 tmp = M3MulS(M3MulM3(cross_matrix, cross_matrix), 1 - c_theta);
+    result = M3Add(result, tmp);
+
+    // I + cross_matrix * (sin(theta)) + cross_matrix^2 * (1 - cos(theta))
+    return M3Add(identity, result);
 }
 
 // Rotates from 'source' into 'dest'
 static Mat3 M3RotateV(Vec3 source, Vec3 dest) {
-    Mat3 result = {};
-    // TODO(student)
-    return result;
+    Vec3 axis = V3Cross(source, dest);
+    float dot = V3Dot(source, dest);
+    float len_s = V3Length(source), len_d = V3Length(dest);
+
+    // a*b = |A||B|cos(theta) => theta = arccos((a * b)/(|A||B|))
+    float theta = acosf(dot / (len_s * len_d));
+
+    return M3Rotate(theta, axis);
 }
 
+
+static Mat3 M3Adj(Mat3 m) {
+    // Accidentally wrote the cofactor matrix but with column major indexes
+    // so the matrix is effectively transposed and you get the adjugate matrix
+    return (Mat3){
+        .r0 = {m.s11 * m.s22 - m.s21 * m.s12, -(m.s01 * m.s22 - m.s21 * m.s02), m.s01 * m.s12 - m.s11 * m.s02},
+        .r1 = {-(m.s10 * m.s22 - m.s20 * m.s12), m.s00 * m.s22 - m.s20 * m.s02, -(m.s00 * m.s12 - m.s10 * m.s02)},
+        .r2 = {m.s10 * m.s21 - m.s20 * m.s11, -(m.s00 * m.s21 - m.s20 * m.s01), m.s00 * m.s11 - m.s10 * m.s01},
+    };
+}
+
+
+// https://www.geeksforgeeks.org/maths/inverse-of-3x3-matrix/
 static Mat3 M3Inverse(Mat3 m) {
-    Mat3 result = {};
-    // TODO(student)
-    
-    return result;
+    float det = M3Det(m);
+    if (fabsf(det) < EPSILON) {
+        return m;
+    }
+
+    return M3DivS(M3Adj(m), det);
 }
 
 static Mat4 M4Neg(Mat4 m) {
