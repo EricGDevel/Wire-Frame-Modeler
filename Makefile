@@ -3,18 +3,25 @@ CC          ?= gcc
 STD         := -std=c99
 WARN        := -Wall -Wno-missing-braces -Wno-unused-function
 OPT         ?= -O2
-CFLAGS      := $(STD) $(WARN) -ggdb $(OPT)
+CFLAGS      := $(STD) $(WARN) $(OPT)
+DBGFLAGS    ?= -ggdb3 -O0 -fno-omit-frame-pointer -fno-inline -DDEBUG
 
 INCLUDES    := -Ilib/include
 LDFLAGS     := -Wl,-rpath,'$$ORIGIN' -Llib/lib-linux
 LDLIBS      := -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
-TEST_LDLIBS := -lm
+TEST_LDLIBS := $(LDFLAGS) $(LDLIBS)
 
 # Project paths and files
 TARGET      := cg
 BUILD_DIR   := build
 TEST_DIR    := tests
 HEADERS     := $(wildcard *.h)
+
+# Automatically include any .c file that has a matching .h file (e.g., model.h -> model.c)
+MODULE_SRCS := $(wildcard $(HEADERS:.h=.c))
+MODULE_OBJS := $(patsubst %.c,$(BUILD_DIR)/%.o,$(MODULE_SRCS))
+MAIN_OBJ    := $(BUILD_DIR)/main.o
+OBJS        := $(MAIN_OBJ) $(MODULE_OBJS)
 
 # Auto-discover unit tests (supports tests/*.c and tests/<suite>/*.c)
 TEST_SRCS   := $(sort $(wildcard $(TEST_DIR)/*.c $(TEST_DIR)/*/*.c))
@@ -30,18 +37,28 @@ TEST_NAMES  := $(notdir $(basename $(TEST_SRCS)))
 # Default target: build main executable
 all: $(TARGET)
 
-$(TARGET): main.c $(HEADERS)
-	@echo "Building $(TARGET)..."
-	$(CC) main.c $(INCLUDES) $(LDFLAGS) $(LDLIBS) $(CFLAGS) -o $@
+$(TARGET): $(OBJS)
+	@echo "Linking $(TARGET)..."
+	$(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) $(CFLAGS) -o $@
 
-# Build without optimizations for easier gdb debugging
-debug:
-	$(MAKE) OPT=-O0 all
-
-# Pattern rule: compile any tests/<path>.c -> build/tests/<path>
-$(BUILD_DIR)/$(TEST_DIR)/%: $(TEST_DIR)/%.c $(TEST_DEPS)
+# Rule for main.c (depends on all headers)
+$(MAIN_OBJ): main.c $(HEADERS)
 	@mkdir -p $(dir $@)
-	$(CC) $< $(INCLUDES) $(CFLAGS) $(TEST_LDLIBS) -o $@
+	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
+
+# Pattern rule: each module .c file is compiled with its matching .h file
+$(BUILD_DIR)/%.o: %.c %.h
+	@mkdir -p $(dir $@)
+	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
+
+# Build with debug symbols and no optimizations for gdb debugging
+debug: CFLAGS += $(DBGFLAGS)
+debug: all
+
+# Pattern rule: compile any tests/<path>.c -> build/tests/<path> (linked with module objects)
+$(BUILD_DIR)/$(TEST_DIR)/%: $(TEST_DIR)/%.c $(MODULE_OBJS) $(TEST_DEPS)
+	@mkdir -p $(dir $@)
+	$(CC) $< $(MODULE_OBJS) $(INCLUDES) $(CFLAGS) $(TEST_LDLIBS) -o $@
 
 # Run all unit tests
 test: $(TEST_BINS)
