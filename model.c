@@ -1,7 +1,7 @@
 #include "model.h"
 #include "raylib.h"
 
-#include <stdio.h> // For EOL
+#include <ctype.h> // For character checking functions
 #include "stb_ds.h" // For dynamic arrays
 
 
@@ -17,11 +17,18 @@ static int ParseNextInt(const char *str, int *start, int len) {
         if (str[i] == '-') {
             sign = -1;
             break;
+        } else if (str[i] == '+') {
+            ++i;
+            sign = 1;
+            break;
         } else if (str[i] >= '0' && str[i] <= '9') {
             break;
-        } else if (str[i] == EOF || str[i] == '\n') {
-            return 0;
+        } else if (str[i] != '\n' && isspace(str[i])) {
+            continue;
         }
+
+        // Empty number, either reached newline, EOF or non-number character
+        return 0;
     }
 
     for (; i < len; ++i) {
@@ -53,11 +60,18 @@ static float ParseNextFloat(const char *str, int *start, int len) {
             ++i;
             sign = -1;
             break;
+        } else if (str[i] == '+') {
+            ++i;
+            sign = 1;
+            break;
         } else if (str[i] >= '0' && str[i] <= '9') {
             break;
-        } else if (str[i] == EOF || str[i] == '\n') {
-            return 0.f;
+        } else if (str[i] != '\n' && isspace(str[i])) {
+            continue;
         }
+
+        // Empty number, either reached newline, EOF or non-number character
+        return 0.f;
     }
 
     int before_dot = 0;
