@@ -8,6 +8,9 @@
 //
 // Provided helper functions
 //
+
+static inline bool iswhitespace(char c) { return (isspace(c) && c != '\n'); }
+
 static int ParseNextInt(const char *str, int *start, int len) {
     int sign = 1;
     int result = 0;
@@ -23,7 +26,7 @@ static int ParseNextInt(const char *str, int *start, int len) {
             break;
         } else if (str[i] >= '0' && str[i] <= '9') {
             break;
-        } else if (str[i] != '\n' && isspace(str[i])) {
+        } else if (iswhitespace(str[i])) {
             continue;
         }
 
@@ -66,7 +69,7 @@ static float ParseNextFloat(const char *str, int *start, int len) {
             break;
         } else if (str[i] >= '0' && str[i] <= '9') {
             break;
-        } else if (str[i] != '\n' && isspace(str[i])) {
+        } else if (iswhitespace(str[i])) {
             continue;
         }
 
@@ -130,19 +133,61 @@ static Vec3 ParseNextVec3(const char *str, int *start, int len) {
 // Helper functions end
 
 
-Model LoadModelFromObjFile(const char *filename) {
-    Model model = {};
+static FaceElement ParseNextFaceElement(const char *str, int *start, int len) {
+    FaceElement e = {.v = 0, .vt = 0, .vn = 0};
+    int i = *start;
 
-    int dataSize = -1;
-    const char *data = (char *)LoadFileData(filename, &dataSize);
+    e.v = ParseNextInt(str, &i, len);
+    if (str[i] != '/') {
+        // End of element
+        goto cleanup;
+    }
+    // assert(str[i] == '/');
+    i++;
+
+    // If vt is missing (x//z), then it will read a empty int
+    e.vt = ParseNextInt(str, &i, len);
+    if (str[i] != '/') {
+        // End of element
+        goto cleanup;
+    }
+    i++;
+
+    e.vn = ParseNextInt(str, &i, len);
+
+cleanup:
+    *start = i;
+    return e;
+}
+
+// Currently assume that all faces are triangles (have exactly 3 verticies)
+// TODO: Create generic face struct that contains dynamic array of FaceElements
+// and update parsing logic
+static TriangleFace ParseFace(const char *str, int *start, int len) {
+    TriangleFace f;
+    int i = *start;
+
+    for (int elem = 0; elem < 3; elem++) {
+        f.elements[elem] = ParseNextFaceElement(str, &i, len);
+    }
+
+    *start = i;
+    return f;
+}
+
+
+static Model LoadModel(const char *data, int dataSize) {
+    Model model = {};
 
     int lineIndex = 0;
     for (int i = 0; i < dataSize; ++i) {
         // Skip whitespace
-        while ((data[i] == ' ' || data[i] == '\t' || data[i] == '\r') && (i < dataSize)) {
+        while (iswhitespace(data[i]) && i < dataSize) {
             ++i;
         }
 
+        // Parsed using the following specification:
+        // https://www.martinreddy.net/gfx/3d/OBJ.spec
         switch (data[i]) {
             case '#': {
                 // OBJ comment, ignore line
@@ -150,29 +195,40 @@ Model LoadModelFromObjFile(const char *filename) {
 
             case 'v': {
                 ++i;
-                if (data[i] == ' ') {
+                if (iswhitespace(data[i])) {
+                    // Geometric Vertex
                     Vec3 v = ParseNextVec3(data, &i, dataSize);
                     arrput(model.vertices, v);
                 } else if (data[i] == 'n') {
-                    // TODO(student)
+                    // Vertex Normal
+                    ++i;
+                    Vec3 normal = ParseNextVec3(data, &i, dataSize);
+                    arrput(model.normals, normal);
+                } else if (data[i] == 't') {
+                    // Vertex tetures
+                    ++i;
+                    Vec2 texture = ParseNextVec2(data, &i, dataSize);
+                    arrput(model.textures, texture);
                 } else {
                     TraceLog(LOG_WARNING,
-                             "%s:%d: OBJ Loader: Unhandled character '%c' when parsing a vertex, skipping the rest of "
+                             "%d: OBJ Loader: Unhandled character '%c' when parsing a vertex, skipping the rest of "
                              "the line",
-                             filename, lineIndex, data[i]);
+                             lineIndex, data[i]);
                 }
-            } break;
+                break;
+            }
 
             case 'f': {
                 ++i;
-                // TODO(student): No need for arbitrary polygons, only triangles are fine
-            } break;
+                TriangleFace f = ParseFace(data, &i, dataSize);
+                arrput(model.faces, f);
+                break;
+            }
 
             default: {
-                TraceLog(
-                    LOG_WARNING,
-                    "%s:%d: OBJ Loader: Unhandled character '%c' when parsing a line, skipping the rest of the line",
-                    filename, lineIndex, data[i]);
+                TraceLog(LOG_WARNING,
+                         "%d: OBJ Loader: Unhandled character '%c' when parsing a line, skipping the rest of the line",
+                         lineIndex, data[i]);
             } break;
         }
 
@@ -184,9 +240,28 @@ Model LoadModelFromObjFile(const char *filename) {
         lineIndex += 1;
     }
 
-    UnloadFileData((unsigned char *)data);
-
+    model.vertexCount = arrlen(model.vertices);
+    model.textureCount = arrlen(model.textures);
+    model.normalCount = arrlen(model.normals);
+    model.faceCount = arrlen(model.faces);
     return model;
 }
 
-void FreeModel(Model *model) { arrfree(model->vertices); }
+Model LoadModelFromStr(const char *str) { return LoadModel(str, strlen(str)); }
+
+Model LoadModelFromObjFile(const char *filename) {
+    int dataSize = -1;
+    const char *data = (char *)LoadFileData(filename, &dataSize);
+
+    Model model = LoadModel(data, dataSize);
+
+    UnloadFileData((unsigned char *)data);
+    return model;
+}
+
+void FreeModel(Model *model) {
+    arrfree(model->vertices);
+    arrfree(model->textures);
+    arrfree(model->normals);
+    arrfree(model->faces);
+}
