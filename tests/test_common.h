@@ -6,6 +6,9 @@
 #include <math.h>
 #include "../math.h"
 
+#define STB_DS_IMPLEMENTATION
+#include <stb_ds.h>
+
 #if !defined(TEST_TOLERANCE)
 #define TEST_TOLERANCE 1e-4f
 #endif
@@ -63,6 +66,19 @@ static inline bool Mat4Near(Mat4 a, Mat4 b) {
     if (!(cond)) { \
         g_tests_failed++; \
         printf(FAIL_TAG " %s (" ANSI_YELLOW "%s:%d" ANSI_RESET "): expected true\n", name, __FILE__, __LINE__); \
+    } else { \
+        printf(PASS_TAG " %s\n", name); \
+    } \
+} while (0)
+
+#define EXPECT_INT(name, actual, expected) do { \
+    g_tests_run++; \
+    long long _a = (long long)(actual); \
+    long long _e = (long long)(expected); \
+    if (_a != _e) { \
+        g_tests_failed++; \
+        printf(FAIL_TAG " %s (" ANSI_YELLOW "%s:%d" ANSI_RESET "): got " ANSI_RED "%lld" ANSI_RESET ", expected " ANSI_GREEN "%lld" ANSI_RESET "\n", \
+               name, __FILE__, __LINE__, _a, _e); \
     } else { \
         printf(PASS_TAG " %s\n", name); \
     } \
