@@ -38,8 +38,14 @@ typedef struct Model {
 
     // Model transformation data
     Vec3 position;
+    Vec3 rotation; // Euler angles
+    Vec3 scale;
+    Vec3 minBound, maxBound;
+
     bool hidden;
-    // TODO(student) ...
+    bool showVertexNormals;
+    bool showFaceNormals;
+    bool showBoundingBox;
 
     // GPU handles (HW3)
     unsigned int gpuVertexBufferId;

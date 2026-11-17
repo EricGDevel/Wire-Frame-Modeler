@@ -176,9 +176,22 @@ static TriangleFace ParseFace(const char *str, int *start, int len) {
 }
 
 
+static void updateBoundsVectors(Vec3 *v, Vec3 *min, Vec3 *max) {
+    for (int i = 0; i < 3; i++) {
+        if (v->values[i] > max->values[i]) {
+            max->values[i] = v->values[i];
+        }
+        if (v->values[i] < min->values[i]) {
+            min->values[i] = v->values[i];
+        }
+    }
+}
+
+
 static Model LoadModel(const char *data, int dataSize) {
     Model model = {};
 
+    Vec3 minBound = (Vec3){INFINITY, INFINITY, INFINITY}, maxBound = (Vec3){-INFINITY, -INFINITY, -INFINITY};
     int lineIndex = 0;
     for (int i = 0; i < dataSize; ++i) {
         // Skip whitespace
@@ -198,6 +211,7 @@ static Model LoadModel(const char *data, int dataSize) {
                 if (iswhitespace(data[i])) {
                     // Geometric Vertex
                     Vec3 v = ParseNextVec3(data, &i, dataSize);
+                    updateBoundsVectors(&v, &minBound, &maxBound);
                     arrput(model.vertices, v);
                 } else if (data[i] == 'n') {
                     // Vertex Normal
@@ -240,10 +254,22 @@ static Model LoadModel(const char *data, int dataSize) {
         lineIndex += 1;
     }
 
+    model.position = (Vec3){0, 0, 0};
+    model.rotation = (Vec3){0, 0, 0};
+    model.scale = (Vec3){1, 1, 1};
+    model.minBound = minBound;
+    model.maxBound = maxBound;
+
     model.vertexCount = arrlen(model.vertices);
     model.textureCount = arrlen(model.textures);
     model.normalCount = arrlen(model.normals);
     model.faceCount = arrlen(model.faces);
+
+    model.hidden = false;
+    model.showBoundingBox = false;
+    model.showVertexNormals = false;
+    model.showFaceNormals = false;
+
     return model;
 }
 
