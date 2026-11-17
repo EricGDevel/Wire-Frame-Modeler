@@ -1,0 +1,56 @@
+BasedOnStyle: LLVM
+Language: Cpp
+
+# Indentation: 4 spaces, never tabs
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ContinuationIndentWidth: 4
+IndentCaseLabels: true
+IndentPPDirectives: None
+AccessModifierOffset: -4
+
+# Braces: always attach '{' on the same line as if/for/while/switch/functions/structs
+BreakBeforeBraces: Attach
+InsertBraces: true
+
+# Pointer/reference alignment matches codebase style (e.g., `Vec3 *vertices`, `Scene *scene`)
+PointerAlignment: Right
+
+# No redundant horizontal alignment whitespace on lines
+AlignConsecutiveAssignments: None
+AlignConsecutiveBitFields: None
+AlignConsecutiveDeclarations: None
+AlignConsecutiveMacros: None
+AlignOperands: DontAlign
+AlignTrailingComments:
+  Kind: Never
+  OverEmptyLines: 0
+
+# Spacing rules (no redundant spaces inside parens/brackets, single space before '{' and after control keywords)
+SpaceBeforeParens: ControlStatements
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeRangeBasedForLoopColon: true
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpacesInAngles: Never
+SpacesInCStyleCastParentheses: false
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 2
+
+# Short single-line constructs (matches one-line structs and vector helpers in math.h)
+AllowShortRecordOnASingleLine: Always
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
+AllowShortBlocksOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: true
+
+# Line length & wrapping
+ColumnLimit: 120
+SortIncludes: false
+ReflowComments: false

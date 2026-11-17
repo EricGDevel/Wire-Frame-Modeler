@@ -5,3 +5,6 @@
 /models/
 /textures/
 /skyboxes/
+
+# For LSP config, generated using `bear -- make`
+compile_commands.json
