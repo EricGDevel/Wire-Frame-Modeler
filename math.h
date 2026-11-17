@@ -786,9 +786,9 @@ static Mat4 M4ScaleS(float s) {
 static Mat4 M4Translate(Vec3 v) {
     Mat4 result = M4DiagS(1.f);
     // DONE?(student)
-    result.s30 = v.x;
-    result.s31 = v.y;
-    result.s32 = v.z;
+    result.s03 = v.x;
+    result.s13 = v.y;
+    result.s23 = v.z;
     return result;
 }
 
@@ -822,7 +822,7 @@ static Mat4 M4Frustum(float left, float right, float bottom, float top ,float zN
 // maybe a good source https://www.mathematik.uni-marburg.de/~thormae/lectures/graphics1/graphics_6_1_eng_web.html#19
 static Mat4 M4Perspective(float fov, float aspect, float zNear, float zFar) {
     float top, bottom, left, right;
-    top = zNear*atan(fov/2);
+    top = zNear*tan(fov/2);
     bottom = -top;
     right = top*aspect;
     left = -right;
