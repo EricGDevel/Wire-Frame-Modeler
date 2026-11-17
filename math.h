@@ -650,8 +650,13 @@ static Mat4 M4DivS(Mat4 m, float s) {
 }
 
 static Vec4 M4MulV4(Mat4 m, Vec4 v) {
-    Vec4 result = {};
-    // TODO(student)
+    Vec4 result = (Vec4){0.0f,0.0f,0.0f,0.0f};
+    // DONE?(student)
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            result.values[i]+=m.rows[i].values[j]*v.values[j];
+        }
+    }
     return result;
 }
 
@@ -664,7 +669,15 @@ static Vec3 M4MulV3(Mat4 m, Vec3 v) {
 
 static Mat4 M4MulM4(Mat4 m1, Mat4 m2) {
     Mat4 result = {};
-    // TODO(student)
+    // DONE?(student)
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            result.rows[i].values[j] = 0;
+            for (int k = 0; k < 4; k++) {
+                result.rows[i].values[j] += m1.rows[i].values[k]*m2.rows[k].values[j];
+            }
+        }
+    }
     return result;
 }
 
@@ -674,7 +687,12 @@ static bool M4Eq(Mat4 m1, Mat4 m2) {
 
 static Mat4 M4Transpose(Mat4 m) {
     Mat4 result = {};
-    // TODO(student)
+    // DONE?(student)
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            result.rows[j].values[i] = m.rows[i].values[j];//locality optimization?
+        }
+    }
     return result;
 }
 
@@ -710,19 +728,46 @@ static Mat4 M4DiagS(float s) {
 
 static float M4Det(Mat4 m) {
     float result = 0.f;
-    // TODO(student)
+    // DONE?(student)
+    // d_ij := determinant without columns i,j and without the first two rows
+    float d01 = 0.0f, d02 = 0.0f, d03 = 0.0f, d12 = 0.0f, d13 = 0.0f, d23=0.0f;
+    d01 = m.s22 * m.s33 - m.s23 * m.s32;
+    d02 = m.s21 * m.s33 - m.s23 * m.s31;
+    d03 = m.s21 * m.s32 - m.s22 * m.s31;
+    d12 = m.s20 * m.s33 - m.s23 * m.s30;
+    d13 = m.s20 * m.s32 - m.s22 * m.s30;
+    d23 = m.s20 * m.s31 - m.s21 * m.s30;
+    result = m.s00*(m.s11*d01-m.s12*d02+m.s13*d03)
+            -m.s01*(m.s10*d01-m.s12*d12+m.s13*d13)
+            +m.s02*(m.s10*d02-m.s11*d12+m.s13*d23)
+            -m.s03*(m.s10*d03-m.s11*d13+m.s12*d23);
+    return result;
+}
+
+static Mat3 M4toM3(Mat4 m){
+    Mat3 result = {m.s00, m.s01, m.s02, m.s10, m.s11, m.s12, m.s20, m.s21, m.s22};
+    return result;
+}
+
+static Mat4 M3toM4(Mat3 m){
+    Mat4 result = {m.s00, m.s01, m.s02, 0,
+                m.s10, m.s11, m.s12, 0,
+                m.s20, m.s21, m.s22, 0,
+                0, 0, 0, 1};
     return result;
 }
 
 static Mat4 M4Rotate(float theta, Vec3 axis) {
-    Mat4 result = {};
-    // TODO(student)
+    //Mat4 result = {};
+    //Mat3 id = M3DiagS(1);
+    Mat4 result = M3toM4(M3Rotate(theta, axis));
     return result;
 }
 
 static Mat4 M4RotateV(Vec3 source, Vec3 dest) {
     Mat4 result = {};
-    // TODO(student)
+    // DONE?(student)
+    result = M3toM4(M3RotateV(source, dest));
     return result;
 }
 
@@ -740,7 +785,10 @@ static Mat4 M4ScaleS(float s) {
 
 static Mat4 M4Translate(Vec3 v) {
     Mat4 result = M4DiagS(1.f);
-    // TODO(student)
+    // DONE?(student)
+    result.s30 = v.x;
+    result.s31 = v.y;
+    result.s32 = v.z;
     return result;
 }
 
@@ -748,22 +796,48 @@ static Mat4 M4Identity() {
     return M4ScaleS(1.f);
 }
 
+// matrix taken from slide 15 in https://courses.grainger.illinois.edu/cs418/sp2018/slides/CS418-Lecture9-OrthoProjection.pdf
+// also found in slide 21 of https://odedstein.com/teaching/hs-2026-02360216/Tutorial03.pdf
+// I am a bit confused about the matrix M in some other slides (the one that sets z to zero)
 static Mat4 M4Orthographic(float left, float right, float bottom, float top, float zNear, float zFar) {
-    Mat4 result = {};
-    // TODO(student)
+    Mat4 result = {2/(right-left), 0, 0, -(right+left)/(right-left),
+                0, 2/(top-bottom), 0, -(top+bottom)/(top-bottom), 
+                0, 0, -2/(zFar - zNear), -(zFar+zNear)/(zFar-zNear),
+                0, 0, 0, 1};
+    // DONE?(student)
+    // TODO: add M that sets z=0 if doesn't work
     return result;
 }
 
+static Mat4 M4Frustum(float left, float right, float bottom, float top ,float zNear, float zFar){
+    float dVrt = top - bottom, dHrz = right - left, dz = zFar - zNear;
+    Mat4 result = {2*zNear/dHrz, 0, (right+left)/dHrz, 0,
+                0, 2*zNear/dVrt, (top+bottom)/dVrt, 0,
+                0, 0, -(zFar+zNear)/dz, -2*zNear*zFar/dz,
+                0, 0, -1, 0};
+    //DONE?(now)
+    return result;
+}
+
+// maybe a good source https://www.mathematik.uni-marburg.de/~thormae/lectures/graphics1/graphics_6_1_eng_web.html#19
 static Mat4 M4Perspective(float fov, float aspect, float zNear, float zFar) {
-    Mat4 result = {};
-    // TODO(student)
+    float top, bottom, left, right;
+    top = zNear*atan(fov/2);
+    bottom = -top;
+    right = top*aspect;
+    left = -right;
+    Mat4 result = M4Frustum(left, right, bottom, top, zNear, zFar);
+    // DONE?(student)
     return result;
 }
 
 static Mat4 M4LookAt(Vec3 eye, Vec3 target, Vec3 up) {
-    Mat4 result = {};
-    // TODO(student)
-    return result;
+    //Mat4 result = {};
+    Vec3 n = V3Normalize(V3Sub(eye, target));
+    Vec3 u = V3Normalize(V3Cross(up, n));
+    Vec3 v = V3Normalize(V3Cross(n, u));
+    // DONE?(student)
+    return M4MulM4(M3toM4((Mat3){.r0=u,.r1=v,.r2=n}), M4Translate(V3Neg(eye)));
 }
 
 #endif // MATH_HEADER
