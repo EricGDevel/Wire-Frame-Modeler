@@ -2,6 +2,28 @@
 #include "../../primitives.h"
 #include <raylib.h>
 
+static void ValidateModelDefaultsAndBounds(const char *prefix, Model m, Vec3 expectedMin, Vec3 expectedMax) {
+    char label[128];
+
+    snprintf(label, sizeof(label), "%s: default position == (0,0,0)", prefix);
+    EXPECT_VEC3(label, m.position, ((Vec3){0.0f, 0.0f, 0.0f}));
+
+    snprintf(label, sizeof(label), "%s: default rotation == (0,0,0)", prefix);
+    EXPECT_VEC3(label, m.rotation, ((Vec3){0.0f, 0.0f, 0.0f}));
+
+    snprintf(label, sizeof(label), "%s: default scale == (1,1,1)", prefix);
+    EXPECT_VEC3(label, m.scale, ((Vec3){1.0f, 1.0f, 1.0f}));
+
+    snprintf(label, sizeof(label), "%s: default flags all false", prefix);
+    EXPECT_TRUE(label, !m.hidden && !m.showBoundingBox && !m.showVertexNormals && !m.showFaceNormals);
+
+    snprintf(label, sizeof(label), "%s: minBound == (-1,-1,-1)", prefix);
+    EXPECT_VEC3(label, m.minBound, expectedMin);
+
+    snprintf(label, sizeof(label), "%s: maxBound == (1,1,1)", prefix);
+    EXPECT_VEC3(label, m.maxBound, expectedMax);
+}
+
 static void ValidateFaceIndicesAndNonDegenerate(const char *prefix, Model m) {
     bool allValidV = true;
     bool allValidVt = true;
@@ -52,6 +74,8 @@ static void TestPrimitiveCube(void) {
     EXPECT_INT("Cube: faceCount == 12 (triangulated)", cube.faceCount, 12);
     EXPECT_INT("Cube: arrlen(faces) == 12", arrlen(cube.faces), 12);
 
+    ValidateModelDefaultsAndBounds("Cube", cube, ((Vec3){-1.0f, -1.0f, -1.0f}), ((Vec3){1.0f, 1.0f, 1.0f}));
+
     bool cornersAtOne = (cube.vertexCount == 8);
     for (int i = 0; i < cube.vertexCount; ++i) {
         Vec3 v = cube.vertices[i];
@@ -85,6 +109,8 @@ static void TestPrimitiveSphere(void) {
     EXPECT_INT("Sphere: textureCount == 559", sphere.textureCount, 559);
     EXPECT_INT("Sphere: faceCount == 960 (triangulated)", sphere.faceCount, 960);
     EXPECT_INT("Sphere: arrlen(faces) == 960", arrlen(sphere.faces), 960);
+
+    ValidateModelDefaultsAndBounds("Sphere", sphere, ((Vec3){-1.0f, -1.0f, -1.0f}), ((Vec3){1.0f, 1.0f, 1.0f}));
 
     bool onUnitSphere = (sphere.vertexCount == 482);
     for (int i = 0; i < sphere.vertexCount; ++i) {
