@@ -267,6 +267,14 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
         scene->activeCameraIndex = 0;
     }
 
+    // Ensure at least one model exists
+    if (arrlen(scene->models) == 0) {
+        AddModel(scene, MakePrimativeCube());
+    }
+    if (scene->activeModelIndex < 0 || scene->activeModelIndex >= arrlen(scene->models)) {
+        scene->activeModelIndex = 0;
+    }
+
     // File dialog should lock all other UI elements if it's active, so we need to initialize it first
     static GuiWindowFileDialogState fileDialogState = {};
     static FileDialogOperaion fileDialogOperation = -1;
@@ -358,7 +366,7 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
                     moveDelta.z += moveStep;
                 }
 
-                if (V3LengthSquared(moveDelta) > 0.0f) {
+                if (V3LengthSquared(moveDelta) > EPSILON) {
                     Vec3 worldDelta = TransformDeltaByCamera(moveDelta, activeCam, relativeToCamera);
                     *targetPos = V3Add(*targetPos, worldDelta);
                 }
@@ -368,10 +376,10 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
                 // Q = rotate anticlockwise, E = rotate clockwise
                 // Left/Right arrows = yaw left/right
                 Vec3 rotDelta = {0.0f, 0.0f, 0.0f};
-                if (IsKeyDown(KEY_Z) || IsKeyDown(KEY_UP)) {
+                if (IsKeyDown(KEY_UP)) {
                     rotDelta.x -= rotStep;
                 }
-                if (IsKeyDown(KEY_X) || IsKeyDown(KEY_DOWN)) {
+                if (IsKeyDown(KEY_DOWN)) {
                     rotDelta.x += rotStep;
                 }
                 if (IsKeyDown(KEY_LEFT)) {
@@ -387,7 +395,7 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
                     rotDelta.z -= rotStep; // Clockwise
                 }
 
-                if (V3LengthSquared(rotDelta) > 0.0f) {
+                if (V3LengthSquared(rotDelta) > EPSILON) {
                     Vec3 worldRotDelta = TransformDeltaByCamera(rotDelta, activeCam, relativeToCamera);
                     *targetRot = V3Add(*targetRot, worldRotDelta);
                 }
@@ -556,8 +564,15 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
         }
 
         BOX_FLOAT(&scene->step, &left, uiTop + 4, "Set the step size when moving with WASD");
-        BOX_INT(&settings->problemX, &left, uiTop + 4, "Problem Pixel X");
-        BOX_INT(&settings->problemY, &left, uiTop + 4, "Problem Pixel Y");
+        {
+            Rectangle ppRect = (Rectangle){left, uiTop + 4, 14, 14};
+            GuiCheckBox(ppRect, "Show Problem Pixel", &settings->showProblem);
+            left += 128;
+        }
+        if (settings->showProblem) {
+            BOX_INT(&settings->problemX, &left, uiTop + 4, "Problem Pixel X");
+            BOX_INT(&settings->problemY, &left, uiTop + 4, "Problem Pixel Y");
+        }
     }
     uiTop += iconButtonSize + margin;
 
