@@ -38,10 +38,15 @@ int main()
     
     // Our main structures are Scene, RenderSettings and Renderer, initialized here.
     Scene scene = {};
+    scene.step = 1.0f;
     AddCamera(&scene, MakeDefaultCamera());
-    { // TODO(student): Move this to the UI
+    {
         const char *modelPath = TextFormat("%s" PATH_SEPERATOR "models" PATH_SEPERATOR "monkey.obj", GetApplicationDirectory());
-        AddModel(&scene, LoadModelFromObjFile(modelPath));
+        if (FileExists(modelPath)) {
+            AddModel(&scene, LoadModelFromObjFile(modelPath));
+        } else {
+            AddModel(&scene, MakePrimativeCube());
+        }
     }
     
     RenderSettings renderSettings = {};
