@@ -19,6 +19,7 @@ typedef struct RenderSettings {
     
     bool showDebugLayer;
     Vec4 tint;
+    bool showProblem;
     int problemX, problemY;
     
     RenderingMethod renderingMethod;
@@ -129,10 +130,17 @@ void RenderScene(Scene *scene, Renderer *renderer, double time) {
     for (int y = 0; y < settings->height; ++y) {
         for (int x = 0; x < settings->width; ++x) {
             Vec4 *pixel = &renderer->pixels[y*settings->width + x];
-            pixel->r = (((float)x / (float)(renderer->settings->width))  + renderer->settings->tint.r) / 2.f;
-            pixel->g = (((float)y / (float)(renderer->settings->height)) + renderer->settings->tint.g) / 2.f;
-            pixel->b = (((sin(time) + 1.0)/2.0) + renderer->settings->tint.b) / 2.f;
-            pixel->a = 255;
+            if (settings->showProblem && (x == settings->problemX && y == settings->problemY)) {
+                *pixel = (Vec4){0};
+                // An example of drawing a circle and some text with raylib over your scene
+                DrawCircleLines(x, y, 2, RED);
+                DrawText("^problem", x, y + 2, 8, RED);
+            } else {
+                pixel->r = (((float)x / (float)(renderer->settings->width))  + renderer->settings->tint.r) / 2.f;
+                pixel->g = (((float)y / (float)(renderer->settings->height)) + renderer->settings->tint.g) / 2.f;
+                pixel->b = (((sin(time) + 1.0)/2.0) + renderer->settings->tint.b) / 2.f;
+                pixel->a = 255;
+            }
         }
     }
 
