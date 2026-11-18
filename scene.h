@@ -13,6 +13,8 @@ typedef struct Camera {
     Vec3 Position;
     Vec3 rotation;
     ProjectionType pType;
+    Vec3 target;
+    Vec3 at;
 
     // FoV in Radians
     float fov, zNear, zFar;
