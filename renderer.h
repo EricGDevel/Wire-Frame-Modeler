@@ -45,7 +45,7 @@ void RenderScene(Scene *scene, Renderer *renderer, double time);
 #include "stb_ds.h" // For dynamic arrays
 
 void plotPixel(Renderer* renderer, const int x, const int y){
-    if(0 <= x < renderer->settings->width && 0<= y < renderer->settings->height){
+    if(0 <= x && x< renderer->settings->width && 0<= y && y < renderer->settings->height){
     renderer->pixels[y * renderer->settings->width + x] = renderer->settings->tint;}
 }
 
@@ -97,6 +97,16 @@ void bresenhamLowSlope(Renderer *renderer, const Vec2i p1, const Vec2i p2){
     }
 }
 
+Mat4 getCameraTransform(Camera *cam, Renderer *renderer){
+    Mat4 lookAtMat = M4LookAt(cam->Position, (Vec3){0,0,0}, cam->up);
+    Mat4 p = M4DiagS(1);
+    if (cam->pType == PTOrthographic){
+        p = M4Orthographic(cam->left, cam->right, cam->bottom, cam->top, cam->zNear, cam->zFar);
+    } else if(cam->pType == PTPerspective){
+        p = M4Perspective(cam->fov, (float)renderer->settings->width/renderer->settings->height, cam->zNear, cam->zFar);
+    }
+}
+
 void bresenham(Renderer *renderer, const Vec2i p1, const Vec2i p2) {
     //bresenham works in 2d coordinates
     // This is just from the ppt, might need to expand cases
@@ -125,9 +135,9 @@ void RenderScene(Scene *scene, Renderer *renderer, double time) {
         }
     }
 
-    //int modelLength = arrlen(scene->models);
-    // TODO: Remove loop and use scene->activeModelIndex;
-    /*for (int modelIndex = 0; modelIndex < modelLength; modelIndex++) {
+    int modelLength = arrlen(scene->models);
+    Mat4 projMat = getCameraTransform(&scene->cameras[scene->activeCameraIndex], renderer);
+    for (int modelIndex = 0; modelIndex < modelLength; modelIndex++) {
         Model *m = &scene->models[modelIndex];
         for (int faceIndex = 0; faceIndex < m->faceCount; faceIndex++) {
             TriangleFace *f = &m->faces[faceIndex];
@@ -150,8 +160,8 @@ void RenderScene(Scene *scene, Renderer *renderer, double time) {
             //bresenham(renderer, a, c);
             
         }
-    }*/
-    bresenham(renderer, (Vec2i){-1, 759}, (Vec2i){1000,250});
+    }
+    //bresenham(renderer, (Vec2i){-1, 759}, (Vec2i){1000,250});
 }
 
 

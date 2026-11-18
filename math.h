@@ -308,6 +308,13 @@ static Vec4 V4Normalize(Vec4 v) {
     return result;
 }
 
+static Vec4 V3toV4(Vec3 v){
+    return (Vec4){v.x, v.y, v.z, 1};
+}
+
+static Vec3 V4toV3(Vec4 v){
+    return (Vec3){v.x,v.y,v.z};
+}
 //
 // Float Matrices
 //
