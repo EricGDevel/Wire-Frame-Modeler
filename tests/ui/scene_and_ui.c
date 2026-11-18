@@ -20,7 +20,7 @@ static void TestMakeDefaultCamera(void) {
     EXPECT_VEC3("Default Camera target == (0, 0, 0)", cam.target, ((Vec3){0.0f, 0.0f, 0.0f}));
     EXPECT_VEC3("Default Camera up == (0, 1, 0)", cam.up, ((Vec3){0.0f, 1.0f, 0.0f}));
     EXPECT_INT("Default Camera pType == PTPerspective", cam.pType, PTPerspective);
-    EXPECT_FLOAT("Default Camera fov == pi/3", cam.fov, 1.04719755f);
+    EXPECT_FLOAT("Default Camera fov == pi/6", cam.fov, PI_F / 6.0f);
     EXPECT_FLOAT("Default Camera zNear == 0.1", cam.zNear, 0.1f);
     EXPECT_FLOAT("Default Camera zFar == 100.0", cam.zFar, 100.0f);
     EXPECT_FLOAT("Default Camera left == -1.0", cam.left, -1.0f);
