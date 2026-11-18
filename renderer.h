@@ -98,8 +98,7 @@ void bresenhamLowSlope(Renderer *renderer, const Vec2i p1, const Vec2i p2){
 }
 
 Mat4 getCameraTransform(Camera *cam, Renderer *renderer, Mat4 modelTransform){
-    cam->Position = (Vec3){0,0, -1000};
-    Mat4 lookAtMat = M4LookAt(cam->Position, (Vec3){0,0,0}, cam->up);
+    Mat4 lookAtMat = M4LookAt(cam->Position, cam->target, cam->up);
     Mat4 p = M4DiagS(1);
     if (cam->pType == PTOrthographic){
         p = M4Orthographic(cam->left, cam->right, cam->bottom, cam->top, cam->zNear, cam->zFar);
@@ -141,7 +140,9 @@ void RenderScene(Scene *scene, Renderer *renderer, double time) {
     for (int modelIndex = 0; modelIndex < modelLength; modelIndex++) {
         Model *m = &scene->models[modelIndex];
         Mat4 projMat = getCameraTransform(&scene->cameras[scene->activeCameraIndex], renderer, scene->models[modelIndex].modelTransform);
-        if(scene->models[modelIndex].hidden){continue;}
+        if (scene->models[modelIndex].hidden) {
+            continue;
+        }
         for (int faceIndex = 0; faceIndex < m->faceCount; faceIndex++) {
             TriangleFace *f = &m->faces[faceIndex];
             int aIndex = f->a.v, bIndex = f->b.v, cIndex = f->c.v;
