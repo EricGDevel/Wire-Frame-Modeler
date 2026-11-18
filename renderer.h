@@ -44,16 +44,73 @@ void RenderScene(Scene *scene, Renderer *renderer, double time);
 
 #include "stb_ds.h" // For dynamic arrays
 
-
-void bresenham(Renderer *renderer, const Vec3 *p1, const Vec3 *p2) {
-    // TODO
+void plotPixel(Renderer* renderer, const int x, const int y){
+    if(0 <= x < renderer->settings->width && 0<= y < renderer->settings->height){
+    renderer->pixels[y * renderer->settings->width + x] = renderer->settings->tint;}
 }
 
+void bresenhamHighSlope(Renderer *renderer, const Vec2i p1, const Vec2i p2){
+    int x = p1.x;
+    int y = p1.y;
+    int dir_x = p2.x >= p1.x ? 1 : -1;
+    int dir_y = p2.y >= p1.y ? 1 : -1;
+    int dx = p2.x - p1.x;
+    int dy = p2.y - p1.y;
+    dx = dx * dir_x;
+    int d = 2 * dx - dy;
+    int de = 2 * dx;
+    int dne = 2 * (dx - dy);
+    plotPixel(renderer, x, y);
+    for (int y_curr = p1.y; y_curr != p2.y; y_curr += dir_y) {
+        if(d < 0){
+            d += de;
+        }
+        else{
+            x += dir_x;//advance x
+            d += dne;
+        }
+        plotPixel(renderer, x, y_curr);
+    }
+}
+
+void bresenhamLowSlope(Renderer *renderer, const Vec2i p1, const Vec2i p2){
+    int y = p1.y;
+    int x = p1.x;
+    int dir_x = p2.x >= p1.x ? 1 : -1;
+    int dir_y = p2.y >= p1.y ? 1 : -1;
+    int dx = p2.x - p1.x;
+    int dy = p2.y - p1.y;
+    dy = dy * dir_y;
+    int d = 2 * dy - dx;
+    int de = 2 * dy;
+    int dne = 2 * (dy - dx);
+    plotPixel(renderer, x, y);
+    for(int x_curr = p1.x; x_curr != p2.x; x_curr += dir_x){
+        if(d < 0){
+            d += de;
+        }
+        else{
+            y+=dir_y;//advance y
+            d += dne;
+        }
+        plotPixel(renderer, x_curr, y);
+    }
+}
+
+void bresenham(Renderer *renderer, const Vec2i p1, const Vec2i p2) {
+    //bresenham works in 2d coordinates
+    // This is just from the ppt, might need to expand cases
+    if(ABS(p2.y - p1.y) > ABS(p2.x - p1.x)){
+        bresenhamHighSlope(renderer, p1, p2);
+    } else{
+        bresenhamLowSlope(renderer, p1, p2);
+    }
+}
 
 void RenderScene(Scene *scene, Renderer *renderer, double time) {
     // Note that 'TextFormat' uses global storage for the strings it returns, so don't save pointers
     // to those directly if you need to store them long-term, copy the result into a persistant buffer.
-    DrawText(TextFormat("Drawing scene with %d models", arrlen(scene->models)), 400, 100, 10, BLACK);
+    DrawText(TextFormat("Drawing scene with %d models", 0), 400, 100, 10, BLACK);//TODO: revert %d=0 to be model amount
     
     RenderSettings *settings = renderer->settings;
     
@@ -68,9 +125,9 @@ void RenderScene(Scene *scene, Renderer *renderer, double time) {
         }
     }
 
-    int modelLength = arrlen(scene->models);
+    //int modelLength = arrlen(scene->models);
     // TODO: Remove loop and use scene->activeModelIndex;
-    for (int modelIndex = 0; modelIndex < modelLength; modelIndex++) {
+    /*for (int modelIndex = 0; modelIndex < modelLength; modelIndex++) {
         Model *m = &scene->models[modelIndex];
         for (int faceIndex = 0; faceIndex < m->faceCount; faceIndex++) {
             TriangleFace *f = &m->faces[faceIndex];
@@ -88,11 +145,13 @@ void RenderScene(Scene *scene, Renderer *renderer, double time) {
             Vec3 *a = &m->vertices[aIndex - 1], *b = &m->vertices[bIndex - 1], *c = &m->vertices[cIndex - 1];
             
             // Draw wireframe lines
-            bresenham(renderer, a, b);
-            bresenham(renderer, b, c);
-            bresenham(renderer, a, c);
+            //bresenham(renderer, a, b);
+            //bresenham(renderer, b, c);
+            //bresenham(renderer, a, c);
+            
         }
-    }
+    }*/
+    bresenham(renderer, (Vec2i){-1, 759}, (Vec2i){1000,250});
 }
 
 
