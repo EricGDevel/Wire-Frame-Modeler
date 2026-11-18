@@ -19,6 +19,7 @@ typedef struct RenderSettings {
     
     bool showDebugLayer;
     Vec4 tint;
+    bool showProblem;
     int problemX, problemY;
     
     RenderingMethod renderingMethod;
@@ -29,6 +30,7 @@ typedef struct Renderer {
     Vec4 *pixels;
 } Renderer;
 
+RenderSettings MakeDefaultRenderSettings(void);
 void RenderScene(Scene *scene, Renderer *renderer, double time);
 
 #endif // RENDERER_HEADER
@@ -36,7 +38,7 @@ void RenderScene(Scene *scene, Renderer *renderer, double time);
 
 // Renderer Implementation
 // TODO: Change ifdef back
-#if 1 //defined(RENDERER_IMPLEMENTATION)
+#if defined(RENDERER_IMPLEMENTATION)
 #if !defined(RENDERER_IMPLEMENTED)
 #define RENDERER_IMPLEMENTED
 
@@ -118,6 +120,17 @@ void bresenham(Renderer *renderer, const Vec2i p1, const Vec2i p2) {
     }
 }
 
+RenderSettings MakeDefaultRenderSettings(void) {
+    RenderSettings settings = {};
+    settings.tint = (Vec4){0.42f, 0.20f, 0.47f, 1.0f};
+    settings.showProblem = false;
+    settings.problemX = 300;
+    settings.problemY = 300;
+    settings.showDebugLayer = true;
+    settings.renderingMethod = RENDERING_METHOD_SOFTWARE;
+    return settings;
+}
+
 void RenderScene(Scene *scene, Renderer *renderer, double time) {
     // Note that 'TextFormat' uses global storage for the strings it returns, so don't save pointers
     // to those directly if you need to store them long-term, copy the result into a persistant buffer.
@@ -129,10 +142,17 @@ void RenderScene(Scene *scene, Renderer *renderer, double time) {
     for (int y = 0; y < settings->height; ++y) {
         for (int x = 0; x < settings->width; ++x) {
             Vec4 *pixel = &renderer->pixels[y*settings->width + x];
-            pixel->r = (((float)x / (float)(renderer->settings->width))  + renderer->settings->tint.r) / 2.f;
-            pixel->g = (((float)y / (float)(renderer->settings->height)) + renderer->settings->tint.g) / 2.f;
-            pixel->b = (((sin(time) + 1.0)/2.0) + renderer->settings->tint.b) / 2.f;
-            pixel->a = 255;
+            if (settings->showProblem && (x == settings->problemX && y == settings->problemY)) {
+                *pixel = (Vec4){0};
+                // An example of drawing a circle and some text with raylib over your scene
+                DrawCircleLines(x, y, 2, RED);
+                DrawText("^problem", x, y + 2, 8, RED);
+            } else {
+                pixel->r = (((float)x / (float)(renderer->settings->width))  + renderer->settings->tint.r) / 2.f;
+                pixel->g = (((float)y / (float)(renderer->settings->height)) + renderer->settings->tint.g) / 2.f;
+                pixel->b = (((sin(time) + 1.0)/2.0) + renderer->settings->tint.b) / 2.f;
+                pixel->a = 255;
+            }
         }
     }
 

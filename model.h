@@ -58,6 +58,7 @@ typedef struct Model {
 
 Model LoadModelFromStr(const char *str);
 Model LoadModelFromObjFile(const char *filename);
+Mat4 CalcModelTransform(Model *m);
 void FreeModel(Model *model);
 
 #endif // MODEL_HEADER
