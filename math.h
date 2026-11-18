@@ -840,4 +840,20 @@ static Mat4 M4LookAt(Vec3 eye, Vec3 target, Vec3 up) {
     return M4MulM4(M3toM4((Mat3){.r0=u,.r1=v,.r2=n}), M4Translate(V3Neg(eye)));
 }
 
+// Helper: Build 3x3 orientation basis from camera Euler angles (pitch = x, yaw = y, roll = z)
+static Mat3 GetRotationM3(Vec3 rotation) {
+    Mat3 rotX = M3Rotate(rotation.x, (Vec3){1.0f, 0.0f, 0.0f});
+    Mat3 rotY = M3Rotate(rotation.y, (Vec3){0.0f, 1.0f, 0.0f});
+    Mat3 rotZ = M3Rotate(rotation.z, (Vec3){0.0f, 0.0f, 1.0f});
+    return M3MulM3(rotY, M3MulM3(rotX, rotZ));
+}
+
+// Helper: Build 4x4 orientation basis from camera Euler angles (pitch = x, yaw = y, roll = z)
+static Mat4 GetRotationM4(Vec3 rotation) {
+    Mat4 rotX = M4Rotate(rotation.x, (Vec3){1.0f, 0.0f, 0.0f});
+    Mat4 rotY = M4Rotate(rotation.y, (Vec3){0.0f, 1.0f, 0.0f});
+    Mat4 rotZ = M4Rotate(rotation.z, (Vec3){0.0f, 0.0f, 1.0f});
+    return M4MulM4(rotY, M4MulM4(rotX, rotZ));
+}
+
 #endif // MATH_HEADER
