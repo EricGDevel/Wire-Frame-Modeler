@@ -11,8 +11,7 @@ void CreateInterface(RenderSettings *settings, Scene *scene);
 
 
 // UI Implementation
-// TODO: Split into .c file
-#if 1 // defined(INTERFACE_IMPLEMENTATION)
+#if defined(INTERFACE_IMPLEMENTATION)
 #if !defined(INTERFACE_IMPLEMENTED)
 #define INTERFACE_IMPLEMENTED
 
@@ -218,7 +217,23 @@ static void Tooltip(const char *label, int x, int y) {
     GuiDisableTooltip();
 }
 
-// Helper: Aim camera Euler angles (pitch = rotation.x, yaw = rotation.y) at targetPos
+// Helper: Recompute camera target and up vectors from Position and Euler rotation
+static void SyncCameraVectorsFromRotation(Camera *cam) {
+    if (!cam) {
+        return;
+    }
+    float dist = V3Length(V3Sub(cam->target, cam->Position));
+    if (dist < EPSILON) {
+        dist = 3.0f;
+    }
+    Mat3 basis = GetRotationM3(cam->rotation);
+    Vec3 forward = M3MulV3(basis, (Vec3){0.0f, 0.0f, -1.0f});
+    Vec3 up = M3MulV3(basis, (Vec3){0.0f, 1.0f, 0.0f});
+    cam->target = V3Add(cam->Position, V3MulS(forward, dist));
+    cam->up = V3Normalize(up);
+}
+
+// Helper: Aim camera target, up, and Euler angles (pitch = rotation.x, yaw = rotation.y) at targetPos
 static void FocusCameraOnPoint(Camera *cam, Vec3 targetPos) {
     if (!cam) {
         return;
@@ -228,6 +243,7 @@ static void FocusCameraOnPoint(Camera *cam, Vec3 targetPos) {
     if (dist < EPSILON) {
         return;
     }
+    cam->target = targetPos;
     dir = V3DivS(dir, dist);
 
     // Standard camera looking down -Z at rotation (0, 0, 0):
@@ -235,6 +251,9 @@ static void FocusCameraOnPoint(Camera *cam, Vec3 targetPos) {
     cam->rotation.x = asinf(CLAMP(dir.y, -1.0f, 1.0f));
     cam->rotation.y = atan2f(-dir.x, -dir.z);
     cam->rotation.z = 0.0f;
+
+    Mat3 basis = GetRotationM3(cam->rotation);
+    cam->up = V3Normalize(M3MulV3(basis, (Vec3){0.0f, 1.0f, 0.0f}));
 }
 
 // Helper: Transform a local movement delta into camera-relative world axes if relativeToCamera is enabled
@@ -242,10 +261,7 @@ static Vec3 TransformDeltaByCamera(Vec3 localDelta, const Camera *cam, bool rela
     if (!relativeToCamera || !cam) {
         return localDelta;
     }
-    Mat3 rotX = M3Rotate(cam->rotation.x, (Vec3){1.0f, 0.0f, 0.0f});
-    Mat3 rotY = M3Rotate(cam->rotation.y, (Vec3){0.0f, 1.0f, 0.0f});
-    Mat3 rotZ = M3Rotate(cam->rotation.z, (Vec3){0.0f, 0.0f, 1.0f});
-    Mat3 camBasis = M3MulM3(rotY, M3MulM3(rotX, rotZ));
+    Mat3 camBasis = GetRotationM3(cam->rotation);
     return M3MulV3(camBasis, localDelta);
 }
 // Helper functions end
@@ -338,6 +354,10 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
             }
 
             if (targetPos != NULL && targetRot != NULL) {
+                Vec3 prevModPos = activeMod ? activeMod->position : (Vec3){0};
+                Vec3 prevModRot = activeMod ? activeMod->rotation : (Vec3){0};
+                Vec3 prevModScale = activeMod ? activeMod->scale : (Vec3){0};
+
                 float dt = GetFrameTime();
                 if (dt <= 0.0f) {
                     dt = 1.0f / 60.0f;
@@ -369,6 +389,9 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
                 if (V3LengthSquared(moveDelta) > EPSILON) {
                     Vec3 worldDelta = TransformDeltaByCamera(moveDelta, activeCam, relativeToCamera);
                     *targetPos = V3Add(*targetPos, worldDelta);
+                    if (!controlActiveModel && activeCam != NULL) {
+                        activeCam->target = V3Add(activeCam->target, worldDelta);
+                    }
                 }
 
                 // Keyboard rotation:
@@ -376,10 +399,10 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
                 // Q = rotate anticlockwise, E = rotate clockwise
                 // Left/Right arrows = yaw left/right
                 Vec3 rotDelta = {0.0f, 0.0f, 0.0f};
-                if (IsKeyDown(KEY_UP)) {
+                if (IsKeyDown(KEY_Z) || IsKeyDown(KEY_UP)) {
                     rotDelta.x -= rotStep;
                 }
-                if (IsKeyDown(KEY_DOWN)) {
+                if (IsKeyDown(KEY_X) || IsKeyDown(KEY_DOWN)) {
                     rotDelta.x += rotStep;
                 }
                 if (IsKeyDown(KEY_LEFT)) {
@@ -398,6 +421,9 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
                 if (V3LengthSquared(rotDelta) > EPSILON) {
                     Vec3 worldRotDelta = TransformDeltaByCamera(rotDelta, activeCam, relativeToCamera);
                     *targetRot = V3Add(*targetRot, worldRotDelta);
+                    if (!controlActiveModel && activeCam != NULL) {
+                        SyncCameraVectorsFromRotation(activeCam);
+                    }
                 }
 
                 // Zoom: '+' (KEY_EQUAL / KEY_KP_ADD) and '-' (KEY_MINUS / KEY_KP_SUBTRACT)
@@ -432,17 +458,34 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
                     float stepScale = (scene->step > 0.0f ? scene->step : 1.0f);
                     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && (mouseDelta.x != 0.0f || mouseDelta.y != 0.0f)) {
                         Vec3 dragMove = {mouseDelta.x * 0.01f * stepScale, -mouseDelta.y * 0.01f * stepScale, 0.0f};
-                        *targetPos = V3Add(*targetPos, TransformDeltaByCamera(dragMove, activeCam, relativeToCamera));
+                        Vec3 worldDelta = TransformDeltaByCamera(dragMove, activeCam, relativeToCamera);
+                        *targetPos = V3Add(*targetPos, worldDelta);
+                        if (!controlActiveModel && activeCam != NULL) {
+                            activeCam->target = V3Add(activeCam->target, worldDelta);
+                        }
                     }
                     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && (mouseDelta.x != 0.0f || mouseDelta.y != 0.0f)) {
                         Vec3 dragRot = {-mouseDelta.y * 0.01f, -mouseDelta.x * 0.01f, 0.0f};
                         *targetRot = V3Add(*targetRot, TransformDeltaByCamera(dragRot, activeCam, relativeToCamera));
+                        if (!controlActiveModel && activeCam != NULL) {
+                            SyncCameraVectorsFromRotation(activeCam);
+                        }
                     }
                     float wheel = GetMouseWheelMove();
                     if (wheel != 0.0f) {
                         Vec3 wheelMove = {0.0f, 0.0f, -wheel * 0.25f * stepScale};
-                        *targetPos = V3Add(*targetPos, TransformDeltaByCamera(wheelMove, activeCam, relativeToCamera));
+                        Vec3 worldDelta = TransformDeltaByCamera(wheelMove, activeCam, relativeToCamera);
+                        *targetPos = V3Add(*targetPos, worldDelta);
+                        if (!controlActiveModel && activeCam != NULL) {
+                            activeCam->target = V3Add(activeCam->target, worldDelta);
+                        }
                     }
+                }
+
+                if (controlActiveModel && activeMod != NULL &&
+                    (!V3Eq(prevModPos, activeMod->position) || !V3Eq(prevModRot, activeMod->rotation) ||
+                     !V3Eq(prevModScale, activeMod->scale))) {
+                    activeMod->modelTransform = CalcModelTransform(activeMod);
                 }
             }
         } else {
@@ -667,6 +710,9 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
 
             float rowHeight = 18;
             float controlTop = uiTop;
+            Vec3 prevModPos = activeModel->position;
+            Vec3 prevModRot = activeModel->rotation;
+            Vec3 prevModScale = activeModel->scale;
 
             { // Position row
                 float left = uiLeft + margin;
@@ -703,6 +749,11 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
                 BOX_FLOAT(&activeModel->scale.y, &left, uiTop, "Model Scale Y");
                 BOX_FLOAT(&activeModel->scale.z, &left, uiTop, "Model Scale Z");
                 uiTop += rowHeight;
+            }
+            if (activeModel != &dummyModel &&
+                (!V3Eq(prevModPos, activeModel->position) || !V3Eq(prevModRot, activeModel->rotation) ||
+                 !V3Eq(prevModScale, activeModel->scale))) {
+                activeModel->modelTransform = CalcModelTransform(activeModel);
             }
             { // Display overlays row (Bounding Box, Vertex Normals, Face Normals)
                 float left = uiLeft + margin;
@@ -968,9 +1019,35 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
                 GuiDrawText("rotation: ", rect, TEXT_ALIGN_LEFT, GetColor(GuiGetStyle(DEFAULT, TEXT)));
                 left += rect.width + 2;
 
+                Vec3 prevRot = activeCamera->rotation;
                 BOX_FLOAT(&activeCamera->rotation.x, &left, uiTop, "Camera Pitch / Rotation X (rad)");
                 BOX_FLOAT(&activeCamera->rotation.y, &left, uiTop, "Camera Yaw / Rotation Y (rad)");
                 BOX_FLOAT(&activeCamera->rotation.z, &left, uiTop, "Camera Roll / Rotation Z (rad)");
+                if (!V3Eq(prevRot, activeCamera->rotation)) {
+                    SyncCameraVectorsFromRotation(activeCamera);
+                }
+                uiTop += rowHeight;
+            }
+            { // Target row
+                float left = uiLeft + margin;
+                Rectangle rect = (Rectangle){left, uiTop, 80, 16};
+                GuiDrawText("target: ", rect, TEXT_ALIGN_LEFT, GetColor(GuiGetStyle(DEFAULT, TEXT)));
+                left += rect.width + 2;
+
+                BOX_FLOAT(&activeCamera->target.x, &left, uiTop, "Camera Target X");
+                BOX_FLOAT(&activeCamera->target.y, &left, uiTop, "Camera Target Y");
+                BOX_FLOAT(&activeCamera->target.z, &left, uiTop, "Camera Target Z");
+                uiTop += rowHeight;
+            }
+            { // Up vector row
+                float left = uiLeft + margin;
+                Rectangle rect = (Rectangle){left, uiTop, 80, 16};
+                GuiDrawText("up: ", rect, TEXT_ALIGN_LEFT, GetColor(GuiGetStyle(DEFAULT, TEXT)));
+                left += rect.width + 2;
+
+                BOX_FLOAT(&activeCamera->up.x, &left, uiTop, "Camera Up Vector X");
+                BOX_FLOAT(&activeCamera->up.y, &left, uiTop, "Camera Up Vector Y");
+                BOX_FLOAT(&activeCamera->up.z, &left, uiTop, "Camera Up Vector Z");
                 uiTop += rowHeight;
             }
             { // Projection type & zNear / zFar row
