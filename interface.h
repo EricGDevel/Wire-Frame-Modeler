@@ -388,21 +388,19 @@ void CreateInterface(RenderSettings *settings, Scene *scene) {
 
                 if (V3LengthSquared(moveDelta) > EPSILON) {
                     Vec3 worldDelta = TransformDeltaByCamera(moveDelta, activeCam, relativeToCamera);
-                    *targetPos = V3Add(*targetPos, worldDelta);
+                    *targetPos = V3Sub(*targetPos, worldDelta);
                     if (!controlActiveModel && activeCam != NULL) {
-                        activeCam->target = V3Add(activeCam->target, worldDelta);
+                        activeCam->target = V3Sub(activeCam->target, worldDelta);
                     }
                 }
 
-                // Keyboard rotation:
-                // Z = rotate up, X = rotate down
                 // Q = rotate anticlockwise, E = rotate clockwise
                 // Left/Right arrows = yaw left/right
                 Vec3 rotDelta = {0.0f, 0.0f, 0.0f};
-                if (IsKeyDown(KEY_Z) || IsKeyDown(KEY_UP)) {
+                if (IsKeyDown(KEY_UP)) {
                     rotDelta.x -= rotStep;
                 }
-                if (IsKeyDown(KEY_X) || IsKeyDown(KEY_DOWN)) {
+                if (IsKeyDown(KEY_DOWN)) {
                     rotDelta.x += rotStep;
                 }
                 if (IsKeyDown(KEY_LEFT)) {
