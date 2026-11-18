@@ -38,6 +38,7 @@ int main()
     
     // Our main structures are Scene, RenderSettings and Renderer, initialized here.
     Scene scene = {};
+    AddCamera(&scene, MakeDefaultCamera());
     { // TODO(student): Move this to the UI
         const char *modelPath = TextFormat("%s" PATH_SEPERATOR "models" PATH_SEPERATOR "monkey.obj", GetApplicationDirectory());
         AddModel(&scene, LoadModelFromObjFile(modelPath));
