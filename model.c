@@ -274,7 +274,7 @@ static Model LoadModel(const char *data, int dataSize) {
     model.showBoundingBox = false;
     model.showVertexNormals = false;
     model.showFaceNormals = false;
-    model.modelTransform = CalcModelTransform(model);
+    model.modelTransform = CalcModelTransform(&model);
 
     return model;
 }

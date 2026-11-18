@@ -97,7 +97,7 @@ void bresenhamLowSlope(Renderer *renderer, const Vec2i p1, const Vec2i p2){
     }
 }
 
-Mat4 getCameraTransform(Camera *cam, Renderer *renderer){
+Mat4 getCameraTransform(Camera *cam, Renderer *renderer, Mat4 modelTransform){
     Mat4 lookAtMat = M4LookAt(cam->Position, (Vec3){0,0,0}, cam->up);
     Mat4 p = M4DiagS(1);
     if (cam->pType == PTOrthographic){
@@ -105,6 +105,7 @@ Mat4 getCameraTransform(Camera *cam, Renderer *renderer){
     } else if(cam->pType == PTPerspective){
         p = M4Perspective(cam->fov, (float)renderer->settings->width/renderer->settings->height, cam->zNear, cam->zFar);
     }
+    return M4MulM4(p, M4MulM4(lookAtMat, modelTransform));
 }
 
 void bresenham(Renderer *renderer, const Vec2i p1, const Vec2i p2) {
@@ -136,9 +137,9 @@ void RenderScene(Scene *scene, Renderer *renderer, double time) {
     }
 
     int modelLength = arrlen(scene->models);
-    Mat4 projMat = getCameraTransform(&scene->cameras[scene->activeCameraIndex], renderer);
     for (int modelIndex = 0; modelIndex < modelLength; modelIndex++) {
         Model *m = &scene->models[modelIndex];
+        Mat4 projMat = getCameraTransform(&scene->cameras[scene->activeCameraIndex], renderer, scene->models[modelIndex].modelTransform);
         for (int faceIndex = 0; faceIndex < m->faceCount; faceIndex++) {
             TriangleFace *f = &m->faces[faceIndex];
             int aIndex = f->a.v, bIndex = f->b.v, cIndex = f->c.v;
@@ -152,12 +153,21 @@ void RenderScene(Scene *scene, Renderer *renderer, double time) {
             }
 
             // Indexes start from 1 according to obj spec
-            Vec3 *a = &m->vertices[aIndex - 1], *b = &m->vertices[bIndex - 1], *c = &m->vertices[cIndex - 1];
-            
+            Vec3 a = m->vertices[aIndex - 1], b = m->vertices[bIndex - 1], c = m->vertices[cIndex - 1];
+            Vec4 a4 = V3toV4(a), b4 = V3toV4(b), c4 = V3toV4(c);
+            a4 = M4MulV4(projMat, a4);
+            b4 = M4MulV4(projMat, b4);
+            c4 = M4MulV4(projMat, c4);
+            Vec2 f_scr_a = {((float)renderer->settings->width/2)*(a4.x+1), (float)renderer->settings->height/2*(a4.y+1)};
+            Vec2 f_scr_b = {(float)renderer->settings->width/2*(b4.x+1), (float)renderer->settings->height/2*(b4.y+1)};
+            Vec2 f_scr_c = {(float)renderer->settings->width/2*(c4.x+1), (float)renderer->settings->height/2*(c4.y+1)};
+            Vec2i scr_a = (Vec2i){(int)f_scr_a.x, (int)f_scr_a.y};
+            Vec2i scr_b = (Vec2i){(int)f_scr_b.x, (int)f_scr_b.y};
+            Vec2i scr_c = (Vec2i){(int)f_scr_c.x, (int)f_scr_c.y};
             // Draw wireframe lines
-            //bresenham(renderer, a, b);
-            //bresenham(renderer, b, c);
-            //bresenham(renderer, a, c);
+            bresenham(renderer, scr_a, scr_b);
+            bresenham(renderer, scr_b, scr_c);
+            bresenham(renderer, scr_a, scr_c);
             
         }
     }
