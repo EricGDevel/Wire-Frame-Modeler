@@ -187,6 +187,11 @@ static void updateBoundsVectors(Vec3 *v, Vec3 *min, Vec3 *max) {
     }
 }
 
+Mat4 CalcModelTransform(Model *m) {
+    Mat4 pos = M4Translate(m->position);
+    Mat4 rotate = GetRotationM4(m->rotation);
+    return M4MulM4(pos, rotate);
+}
 
 static Model LoadModel(const char *data, int dataSize) {
     Model model = {};
@@ -269,6 +274,7 @@ static Model LoadModel(const char *data, int dataSize) {
     model.showBoundingBox = false;
     model.showVertexNormals = false;
     model.showFaceNormals = false;
+    model.modelTransform = CalcModelTransform(model);
 
     return model;
 }

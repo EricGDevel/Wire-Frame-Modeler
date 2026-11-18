@@ -40,12 +40,13 @@ typedef struct Model {
     Vec3 position;
     Vec3 rotation; // Euler angles
     Vec3 scale;
-    Vec3 minBound, maxBound;
+    Mat4 modelTransform; // Used when transforming vertecies
 
     bool hidden;
     bool showVertexNormals;
     bool showFaceNormals;
     bool showBoundingBox;
+    Vec3 minBound, maxBound;
 
     // GPU handles (HW3)
     unsigned int gpuVertexBufferId;
