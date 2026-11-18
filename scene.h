@@ -53,7 +53,7 @@ Camera MakeDefaultCamera(void) {
     cam.Position = (Vec3){0.0f, 0.0f, 3.0f};
     cam.rotation = (Vec3){0.0f, 0.0f, 0.0f};
     cam.pType = PTPerspective;
-    cam.fov = PI / 6; // 60 degrees in radians
+    cam.fov = PI / 2; // 90 degrees in radians
     cam.target = (Vec3){0, 0, 0};
     cam.up = (Vec3){0, 1, 0};
     cam.zNear = 0.1f;

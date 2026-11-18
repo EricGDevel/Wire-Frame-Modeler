@@ -150,7 +150,7 @@ void RenderScene(Scene *scene, Renderer *renderer, double time) {
                 // TODO: Print warning
                 continue;
             }
-            if (aIndex > m->vertexCount || bIndex > m->vertexCount || cIndex == m->vertexCount) {
+            if (aIndex > m->vertexCount || bIndex > m->vertexCount || cIndex > m->vertexCount) {
                 // TODO: Print warning
                 continue;
             }
