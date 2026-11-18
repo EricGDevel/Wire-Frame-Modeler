@@ -49,12 +49,7 @@ int main()
         }
     }
     
-    RenderSettings renderSettings = {};
-    renderSettings.showProblem = false;
-    renderSettings.tint = (Vec4){.42f, .20f, .47f, 1.f};
-    renderSettings.problemX = 300;
-    renderSettings.problemY = 300;
-    renderSettings.showDebugLayer = true;
+    RenderSettings renderSettings = MakeDefaultRenderSettings();
     
     Renderer renderer = {};
     renderer.settings = &renderSettings;

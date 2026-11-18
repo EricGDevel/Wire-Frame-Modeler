@@ -30,6 +30,7 @@ typedef struct Renderer {
     Vec4 *pixels;
 } Renderer;
 
+RenderSettings MakeDefaultRenderSettings(void);
 void RenderScene(Scene *scene, Renderer *renderer, double time);
 
 #endif // RENDERER_HEADER
@@ -37,7 +38,7 @@ void RenderScene(Scene *scene, Renderer *renderer, double time);
 
 // Renderer Implementation
 // TODO: Change ifdef back
-#if 1 //defined(RENDERER_IMPLEMENTATION)
+#if defined(RENDERER_IMPLEMENTATION)
 #if !defined(RENDERER_IMPLEMENTED)
 #define RENDERER_IMPLEMENTED
 
@@ -117,6 +118,17 @@ void bresenham(Renderer *renderer, const Vec2i p1, const Vec2i p2) {
     } else{
         bresenhamLowSlope(renderer, p1, p2);
     }
+}
+
+RenderSettings MakeDefaultRenderSettings(void) {
+    RenderSettings settings = {};
+    settings.tint = (Vec4){0.42f, 0.20f, 0.47f, 1.0f};
+    settings.showProblem = false;
+    settings.problemX = 300;
+    settings.problemY = 300;
+    settings.showDebugLayer = true;
+    settings.renderingMethod = RENDERING_METHOD_SOFTWARE;
+    return settings;
 }
 
 void RenderScene(Scene *scene, Renderer *renderer, double time) {
