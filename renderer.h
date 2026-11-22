@@ -58,6 +58,7 @@ void bresenhamHighSlope(Renderer *renderer, const Vec2i p1, const Vec2i p2){
     int dir_y = p2.y >= p1.y ? 1 : -1;
     int dx = p2.x - p1.x;
     int dy = p2.y - p1.y;
+    dy = dy * dir_y;
     dx = dx * dir_x;
     int d = 2 * dx - dy;
     int de = 2 * dx;
@@ -83,6 +84,7 @@ void bresenhamLowSlope(Renderer *renderer, const Vec2i p1, const Vec2i p2){
     int dx = p2.x - p1.x;
     int dy = p2.y - p1.y;
     dy = dy * dir_y;
+    dx = dx * dir_x;
     int d = 2 * dy - dx;
     int de = 2 * dy;
     int dne = 2 * (dy - dx);
