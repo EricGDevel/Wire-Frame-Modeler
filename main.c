@@ -1,23 +1,21 @@
-#define RAYGUI_IMPLEMENTATION
 #include <raygui.h>
 
-#define RENDERER_IMPLEMENTATION
 #include "renderer.h"
-
-#define RENDERER_GL_IMPLEMENTATION
 #include "renderer-gl.h"
-
-#define MODEL_IMPLEMENTATION
 #include "model.h"
-
-#define SCENE_IMPLEMENTATION
 #include "scene.h"
-
-#define INTERFACE_IMPLEMENTATION
 #include "interface.h"
 
 #define STB_DS_IMPLEMENTATION
 #include <stb_ds.h> // For dynamic arrays
+
+#ifndef PATH_SEPERATOR
+#ifdef _WIN32
+#define PATH_SEPERATOR "\\"
+#else
+#define PATH_SEPERATOR "/"
+#endif
+#endif
 
 int main() {
     SetWindowState(FLAG_WINDOW_RESIZABLE);
