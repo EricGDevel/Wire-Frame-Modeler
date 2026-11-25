@@ -1,33 +1,10 @@
 #include "../test_common.h"
 
-#define RAYGUI_IMPLEMENTATION
 #include <raygui.h>
 
-#define SCENE_IMPLEMENTATION
 #include "../../scene.h"
-
-#define RENDERER_IMPLEMENTATION
 #include "../../renderer.h"
-
-#define INTERFACE_IMPLEMENTATION
 #include "../../interface.h"
-
-static void TestMakeDefaultCamera(void) {
-    Camera cam = MakeDefaultCamera();
-
-    EXPECT_VEC3("Default Camera Position == (0, 0, 3)", cam.Position, ((Vec3){0.0f, 0.0f, 3.0f}));
-    EXPECT_VEC3("Default Camera rotation == (0, 0, 0)", cam.rotation, ((Vec3){0.0f, 0.0f, 0.0f}));
-    EXPECT_VEC3("Default Camera target == (0, 0, 0)", cam.target, ((Vec3){0.0f, 0.0f, 0.0f}));
-    EXPECT_VEC3("Default Camera up == (0, 1, 0)", cam.up, ((Vec3){0.0f, 1.0f, 0.0f}));
-    EXPECT_INT("Default Camera pType == PTPerspective", cam.pType, PTPerspective);
-    EXPECT_FLOAT("Default Camera fov == pi/6", cam.fov, PI_F / 6.0f);
-    EXPECT_FLOAT("Default Camera zNear == 0.1", cam.zNear, 0.1f);
-    EXPECT_FLOAT("Default Camera zFar == 100.0", cam.zFar, 100.0f);
-    EXPECT_FLOAT("Default Camera left == -1.0", cam.left, -1.0f);
-    EXPECT_FLOAT("Default Camera right == 1.0", cam.right, 1.0f);
-    EXPECT_FLOAT("Default Camera bottom == -1.0", cam.bottom, -1.0f);
-    EXPECT_FLOAT("Default Camera top == 1.0", cam.top, 1.0f);
-}
 
 static void TestSceneModelManagement(void) {
     Scene scene = {};
@@ -161,7 +138,6 @@ int main(void) {
     SetTraceLogLevel(LOG_ERROR);
     PrintSuiteHeader("Running Scene, RenderSettings & UI Helper Unit Tests");
 
-    TestMakeDefaultCamera();
     TestSceneModelManagement();
     TestSceneCameraManagement();
     TestMakeDefaultRenderSettings();

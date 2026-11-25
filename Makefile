@@ -46,8 +46,8 @@ $(MAIN_OBJ): main.c $(HEADERS)
 	@mkdir -p $(dir $@)
 	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
 
-# Pattern rule: each module .c file is compiled with its matching .h file
-$(BUILD_DIR)/%.o: %.c %.h
+# Pattern rule: each module .c file is compiled with project headers
+$(BUILD_DIR)/%.o: %.c $(HEADERS)
 	@mkdir -p $(dir $@)
 	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
 

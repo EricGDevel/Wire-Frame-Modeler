@@ -10,16 +10,16 @@
 #define ABS(a) (((a) >= 0) ? (a) : -(a))
 
 #define CLAMP(a, min, max) MIN(MAX((a), (min)), (max))
-#define LERP(a, t, b) ((1.f - (t))*(a) + (t)*(b))
+#define LERP(a, t, b) ((1.f - (t)) * (a) + (t) * (b))
 
 typedef union Vec2i {
     struct { int x, y; };
     struct { int u, v; };
     struct { int s, t; };
-    
+
     struct { int left, right; };
     struct { int width, height; };
-    
+
     int values[2];
 } Vec2i;
 
@@ -27,29 +27,67 @@ typedef union Vec3i {
     struct { int x, y, z; };
     struct { int r, g, b; };
     struct { int u, v, w; };
-    
-    struct { Vec2i xy; int _ignored0; };
-    struct { Vec2i rg; int _ignored1; };
-    struct { Vec2i uv; int _ignored2; };
-    struct { int _ignored3; Vec2i yz; };
-    struct { int _ignored4; Vec2i gb; };
-    struct { int _ignored5; Vec2i vw; };
-    
+
+    struct {
+        Vec2i xy;
+        int _ignored0;
+    };
+    struct {
+        Vec2i rg;
+        int _ignored1;
+    };
+    struct {
+        Vec2i uv;
+        int _ignored2;
+    };
+    struct {
+        int _ignored3;
+        Vec2i yz;
+    };
+    struct {
+        int _ignored4;
+        Vec2i gb;
+    };
+    struct {
+        int _ignored5;
+        Vec2i vw;
+    };
+
     int values[3];
 } Vec3i;
 
 typedef union Vec4i {
     struct { int x, y, z, w; };
     struct { int r, g, b, a; };
-    
-    struct { Vec3i xyz; int _ignored0; };
-    struct { Vec3i rgb; int _ignored1; };
-    
-    struct { Vec2i xy; Vec2i zw; };
-    struct { int _ignored2; Vec2i yz; int _ignored3; };
-    struct { Vec2i rg; Vec2i ba; };
-    struct { int _ignored4; Vec2i gb; int _ignored5; };
-    
+
+    struct {
+        Vec3i xyz;
+        int _ignored0;
+    };
+    struct {
+        Vec3i rgb;
+        int _ignored1;
+    };
+
+    struct {
+        Vec2i xy;
+        Vec2i zw;
+    };
+    struct {
+        int _ignored2;
+        Vec2i yz;
+        int _ignored3;
+    };
+    struct {
+        Vec2i rg;
+        Vec2i ba;
+    };
+    struct {
+        int _ignored4;
+        Vec2i gb;
+        int _ignored5;
+    };
+
     int values[4];
 } Vec4i;
 
@@ -63,20 +101,20 @@ static Vec2i V2iNeg(Vec2i v) { return (Vec2i){-v.x, -v.y}; }
 static Vec2i V2iAdd(Vec2i v1, Vec2i v2) { return (Vec2i){v1.x + v2.x, v1.y + v2.y}; }
 static Vec2i V2iSub(Vec2i v1, Vec2i v2) { return (Vec2i){v1.x - v2.x, v1.y - v2.y}; }
 
-static Vec2i V2iMulS(Vec2i v, int s)  { return (Vec2i){v.x*s, v.y*s}; }
-static Vec2i V2iDivS(Vec2i v, int s)  { return (Vec2i){v.x/s, v.y/s}; }
+static Vec2i V2iMulS(Vec2i v, int s) { return (Vec2i){v.x * s, v.y * s}; }
+static Vec2i V2iDivS(Vec2i v, int s) { return (Vec2i){v.x / s, v.y / s}; }
 
-static Vec2i V2iMul(Vec2i v1, Vec2i v2) { return (Vec2i){v1.x*v2.x, v1.y*v2.y}; }
-static Vec2i V2iDiv(Vec2i v1, Vec2i v2) { return (Vec2i){v1.x/v2.x, v1.y/v2.y}; }
+static Vec2i V2iMul(Vec2i v1, Vec2i v2) { return (Vec2i){v1.x * v2.x, v1.y * v2.y}; }
+static Vec2i V2iDiv(Vec2i v1, Vec2i v2) { return (Vec2i){v1.x / v2.x, v1.y / v2.y}; }
 
 static bool V2iEq(Vec2i v1, Vec2i v2) { return ((v1.x == v2.x) && (v1.y == v2.y)); }
 
 static Vec2i V2iClamp(Vec2i v, int min, int max) {
     Vec2i result;
-    
+
     result.x = CLAMP(v.x, min, max);
     result.y = CLAMP(v.y, min, max);
-    
+
     return result;
 }
 
@@ -86,21 +124,21 @@ static Vec3i V3iNeg(Vec3i v) { return (Vec3i){-v.x, -v.y, -v.z}; }
 static Vec3i V3iAdd(Vec3i v1, Vec3i v2) { return (Vec3i){v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
 static Vec3i V3iSub(Vec3i v1, Vec3i v2) { return (Vec3i){v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}; }
 
-static Vec3i V3iMulS(Vec3i v, int s) { return (Vec3i){v.x*s, v.y*s, v.z*s}; }
-static Vec3i V3iDivS(Vec3i v, int s) { return (Vec3i){v.x/s, v.y/s, v.z/s}; }
+static Vec3i V3iMulS(Vec3i v, int s) { return (Vec3i){v.x * s, v.y * s, v.z * s}; }
+static Vec3i V3iDivS(Vec3i v, int s) { return (Vec3i){v.x / s, v.y / s, v.z / s}; }
 
-static Vec3i V3iMul(Vec3i v1, Vec3i v2) { return (Vec3i){v1.x*v2.x, v1.y*v2.y, v1.z*v2.z}; }
-static Vec3i V3iDiv(Vec3i v1, Vec3i v2) { return (Vec3i){v1.x/v2.x, v1.y/v2.y, v1.z/v2.z}; }
+static Vec3i V3iMul(Vec3i v1, Vec3i v2) { return (Vec3i){v1.x * v2.x, v1.y * v2.y, v1.z * v2.z}; }
+static Vec3i V3iDiv(Vec3i v1, Vec3i v2) { return (Vec3i){v1.x / v2.x, v1.y / v2.y, v1.z / v2.z}; }
 
 static bool V3iEq(Vec3i v1, Vec3i v2) { return ((v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z)); }
 
 static Vec3i V3iClamp(Vec3i v, int min, int max) {
     Vec3i result;
-    
+
     result.x = CLAMP(v.x, min, max);
     result.y = CLAMP(v.y, min, max);
     result.z = CLAMP(v.z, min, max);
-    
+
     return result;
 }
 
@@ -110,22 +148,22 @@ static Vec4i V4iNeg(Vec4i v) { return (Vec4i){-v.x, -v.y, -v.z, -v.w}; }
 static Vec4i V4iAdd(Vec4i v1, Vec4i v2) { return (Vec4i){v1.x + v2.x, v1.y + v2.y, v1.z + v2.z, v1.w + v2.w}; }
 static Vec4i V4iSub(Vec4i v1, Vec4i v2) { return (Vec4i){v1.x - v2.x, v1.y - v2.y, v1.z - v2.z, v1.w - v2.w}; }
 
-static Vec4i V4iMulS(Vec4i v, int s) { return (Vec4i){v.x*s, v.y*s, v.z*s, v.w*s}; }
-static Vec4i V4iDivS(Vec4i v, int s) { return (Vec4i){v.x/s, v.y/s, v.z/s, v.w/s}; }
+static Vec4i V4iMulS(Vec4i v, int s) { return (Vec4i){v.x * s, v.y * s, v.z * s, v.w * s}; }
+static Vec4i V4iDivS(Vec4i v, int s) { return (Vec4i){v.x / s, v.y / s, v.z / s, v.w / s}; }
 
-static Vec4i V4iMul(Vec4i v1, Vec4i v2) { return (Vec4i){v1.x*v2.x, v1.y*v2.y, v1.z*v2.z, v1.w*v2.w}; }
-static Vec4i V4iDiv(Vec4i v1, Vec4i v2) { return (Vec4i){v1.x/v2.x, v1.y/v2.y, v1.z/v2.z, v1.w/v2.w}; }
+static Vec4i V4iMul(Vec4i v1, Vec4i v2) { return (Vec4i){v1.x * v2.x, v1.y * v2.y, v1.z * v2.z, v1.w * v2.w}; }
+static Vec4i V4iDiv(Vec4i v1, Vec4i v2) { return (Vec4i){v1.x / v2.x, v1.y / v2.y, v1.z / v2.z, v1.w / v2.w}; }
 
 static bool V4iEq(Vec4i v1, Vec4i v2) { return ((v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z) && (v1.w == v2.w)); }
 
 static Vec4i V4iClamp(Vec4i v, int min, int max) {
     Vec4i result;
-    
+
     result.x = CLAMP(v.x, min, max);
     result.y = CLAMP(v.y, min, max);
     result.z = CLAMP(v.z, min, max);
     result.w = CLAMP(v.w, min, max);
-    
+
     return result;
 }
 
@@ -137,10 +175,10 @@ typedef union Vec2 {
     struct { float x, y; };
     struct { float u, v; };
     struct { float s, t; };
-    
+
     struct { float left, right; };
     struct { float width, height; };
-    
+
     float values[2];
 } Vec2;
 
@@ -148,29 +186,67 @@ typedef union Vec3 {
     struct { float x, y, z; };
     struct { float r, g, b; };
     struct { float u, v, w; };
-    
-    struct { Vec2 xy; float _ignored0; };
-    struct { Vec2 rg; float _ignored1; };
-    struct { Vec2 uv; float _ignored2; };
-    struct { float _ignored3; Vec2 yz; };
-    struct { float _ignored4; Vec2 gb; };
-    struct { float _ignored5; Vec2 vw; };
-    
+
+    struct {
+        Vec2 xy;
+        float _ignored0;
+    };
+    struct {
+        Vec2 rg;
+        float _ignored1;
+    };
+    struct {
+        Vec2 uv;
+        float _ignored2;
+    };
+    struct {
+        float _ignored3;
+        Vec2 yz;
+    };
+    struct {
+        float _ignored4;
+        Vec2 gb;
+    };
+    struct {
+        float _ignored5;
+        Vec2 vw;
+    };
+
     float values[3];
 } Vec3;
 
 typedef union Vec4 {
     struct { float x, y, z, w; };
     struct { float r, g, b, a; };
-    
-    struct { Vec3 xyz; float _ignored0; };
-    struct { Vec3 rgb; float _ignored1; };
-    
-    struct { Vec2 xy; Vec2 zw; };
-    struct { float _ignored2; Vec2 yz; float _ignored3; };
-    struct { Vec2 rg; Vec2 ba; };
-    struct { float _ignored4; Vec2 gb; float _ignored5; };
-    
+
+    struct {
+        Vec3 xyz;
+        float _ignored0;
+    };
+    struct {
+        Vec3 rgb;
+        float _ignored1;
+    };
+
+    struct {
+        Vec2 xy;
+        Vec2 zw;
+    };
+    struct {
+        float _ignored2;
+        Vec2 yz;
+        float _ignored3;
+    };
+    struct {
+        Vec2 rg;
+        Vec2 ba;
+    };
+    struct {
+        float _ignored4;
+        Vec2 gb;
+        float _ignored5;
+    };
+
     float values[4];
 } Vec4;
 
@@ -186,14 +262,12 @@ static Vec2 V2Sub(Vec2 v1, Vec2 v2) { return (Vec2){v1.x - v2.x, v1.y - v2.y}; }
 static Vec2 V2MulS(Vec2 v, float s) { return (Vec2){v.x * s, v.y * s}; }
 static Vec2 V2DivS(Vec2 v, float s) { return (Vec2){v.x / s, v.y / s}; }
 
-static Vec2 V2Mul(Vec2 v1, Vec2 v2) { return (Vec2){v1.x*v2.x, v1.y*v2.y}; }
-static Vec2 V2Div(Vec2 v1, Vec2 v2) { return (Vec2){v1.x/v2.x, v1.y/v2.y}; }
+static Vec2 V2Mul(Vec2 v1, Vec2 v2) { return (Vec2){v1.x * v2.x, v1.y * v2.y}; }
+static Vec2 V2Div(Vec2 v1, Vec2 v2) { return (Vec2){v1.x / v2.x, v1.y / v2.y}; }
 
 static bool V2Eq(Vec2 v1, Vec2 v2) { return ((v1.x == v2.x) && (v1.y == v2.y)); }
 
-static Vec2 V2Lerp(Vec2 a, float t, Vec2 b) {
-    return V2Add(V2MulS(a, (1.f - t)), V2MulS(b, t));
-}
+static Vec2 V2Lerp(Vec2 a, float t, Vec2 b) { return V2Add(V2MulS(a, (1.f - t)), V2MulS(b, t)); }
 
 static float V2Dot(Vec2 v1, Vec2 v2) {
     float result;
@@ -209,7 +283,9 @@ static float V2Length(Vec2 v) {
 
 static Vec2 V2Normalize(Vec2 v) {
     float len = V2Length(v);
-    if(len < EPSILON){return v;}
+    if (len < EPSILON) {
+        return v;
+    }
     Vec2 result = {v.x / len, v.y / len};
     return result;
 }
@@ -227,31 +303,25 @@ static Vec3 V3Div(Vec3 v1, Vec3 v2) { return (Vec3){v1.x / v2.x, v1.y / v2.y, v1
 
 static bool V3Eq(Vec3 v1, Vec3 v2) { return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z; }
 
-static Vec3 V3Lerp(Vec3 a, float t, Vec3 b) {
-    return V3Add(V3MulS(a, (1.f - t)), V3MulS(b, t));
-}
+static Vec3 V3Lerp(Vec3 a, float t, Vec3 b) { return V3Add(V3MulS(a, (1.f - t)), V3MulS(b, t)); }
 
-static float V3Dot(Vec3 v1, Vec3 v2) {
-    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-}
+static float V3Dot(Vec3 v1, Vec3 v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; }
 
-static float V3LengthSquared(Vec3 v) {
-    return v.x * v.x + v.y * v.y + v.z * v.z;
-}
+static float V3LengthSquared(Vec3 v) { return v.x * v.x + v.y * v.y + v.z * v.z; }
 
-static float V3Length(Vec3 v) {
-    return sqrt(V3LengthSquared(v));
-}
+static float V3Length(Vec3 v) { return sqrt(V3LengthSquared(v)); }
 
 static Vec3 V3Normalize(Vec3 v) {
     Vec3 result;
     float length = V3Length(v);
-    if(length < EPSILON) return v;
-    
+    if (length < EPSILON) {
+        return v;
+    }
+
     result.x = v.x / length;
     result.y = v.y / length;
     result.z = v.z / length;
-    
+
     return result;
 }
 
@@ -271,50 +341,40 @@ static Vec4 V4Neg(Vec4 v) { return (Vec4){-v.x, -v.y, -v.z, -v.w}; }
 static Vec4 V4Add(Vec4 v1, Vec4 v2) { return (Vec4){v1.x + v2.x, v1.y + v2.y, v1.z + v2.z, v1.w + v2.w}; }
 static Vec4 V4Sub(Vec4 v1, Vec4 v2) { return (Vec4){v1.x - v2.x, v1.y - v2.y, v1.z - v2.z, v1.w - v2.w}; }
 
-static Vec4 V4MulS(Vec4 v, float s) { return (Vec4){v.x*s, v.y*s, v.z*s, v.w*s}; }
-static Vec4 V4DivS(Vec4 v, float s) { return (Vec4){v.x/s, v.y/s, v.z/s, v.w/s}; }
+static Vec4 V4MulS(Vec4 v, float s) { return (Vec4){v.x * s, v.y * s, v.z * s, v.w * s}; }
+static Vec4 V4DivS(Vec4 v, float s) { return (Vec4){v.x / s, v.y / s, v.z / s, v.w / s}; }
 
-static Vec4 V4Mul(Vec4 v1, Vec4 v2) { return (Vec4){v1.x*v2.x, v1.y*v2.y, v1.z*v2.z, v1.w*v2.w}; }
-static Vec4 V4Div(Vec4 v1, Vec4 v2) { return (Vec4){v1.x/v2.x, v1.y/v2.y, v1.z/v2.z, v1.w/v2.w}; }
+static Vec4 V4Mul(Vec4 v1, Vec4 v2) { return (Vec4){v1.x * v2.x, v1.y * v2.y, v1.z * v2.z, v1.w * v2.w}; }
+static Vec4 V4Div(Vec4 v1, Vec4 v2) { return (Vec4){v1.x / v2.x, v1.y / v2.y, v1.z / v2.z, v1.w / v2.w}; }
 
 static bool V4Eq(Vec4 v1, Vec4 v2) { return ((v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z) && (v1.w == v2.w)); }
 
-static Vec4 V4Lerp(Vec4 a, float t, Vec4 b) {
-    return V4Add(V4MulS(a, (1.f - t)), V4MulS(b, t));
-}
+static Vec4 V4Lerp(Vec4 a, float t, Vec4 b) { return V4Add(V4MulS(a, (1.f - t)), V4MulS(b, t)); }
 
-static float V4Dot(Vec4 v1, Vec4 v2) {
-    return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z) + (v1.w * v2.w);
-}
+static float V4Dot(Vec4 v1, Vec4 v2) { return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z) + (v1.w * v2.w); }
 
-static float V4LengthSquared(Vec4 v) {
-    return V4Dot(v, v);
-}
+static float V4LengthSquared(Vec4 v) { return V4Dot(v, v); }
 
-static float V4Length(Vec4 v) {
-    return sqrt(V4LengthSquared(v));
-}
+static float V4Length(Vec4 v) { return sqrt(V4LengthSquared(v)); }
 
 static Vec4 V4Normalize(Vec4 v) {
     Vec4 result;
     float length = V4Length(v);
-    if(length < EPSILON) return v;
-    
+    if (length < EPSILON) {
+        return v;
+    }
+
     result.x = v.x / length;
     result.y = v.y / length;
     result.z = v.z / length;
     result.w = v.w / length;
-    
+
     return result;
 }
 
-static Vec4 V3toV4(Vec3 v){
-    return (Vec4){v.x, v.y, v.z, 1};
-}
+static Vec4 V3toV4(Vec3 v) { return (Vec4){v.x, v.y, v.z, 1}; }
 
-static Vec3 V4toV3(Vec4 v){
-    return (Vec3){v.x,v.y,v.z};
-}
+static Vec3 V4toV3(Vec4 v) { return (Vec3){v.x, v.y, v.z}; }
 //
 // Float Matrices
 //
@@ -324,7 +384,7 @@ typedef union Mat2 {
         float s00, s01;
         float s10, s11;
     };
-    
+
     struct { Vec2 r0, r1; };
     Vec2 rows[2];
     Vec4 value;
@@ -336,7 +396,7 @@ typedef union Mat3 {
         float s10, s11, s12;
         float s20, s21, s22;
     };
-    
+
     struct { Vec3 r0, r1, r2; };
     Vec3 rows[3];
 } Mat3;
@@ -348,7 +408,7 @@ typedef union Mat4 {
         float s20, s21, s22, s23;
         float s30, s31, s32, s33;
     };
-    
+
     struct { Vec4 r0, r1, r2, r3; };
     Vec4 rows[4];
 } Mat4;
@@ -404,16 +464,14 @@ static Mat2 M2MulM2(Mat2 m1, Mat2 m2) {
     return result;
 }
 
-static bool M2Eq(Mat2 m1, Mat2 m2) {
-    return V2Eq(m1.r0, m2.r0) && V2Eq(m1.r1, m2.r1);
-}
+static bool M2Eq(Mat2 m1, Mat2 m2) { return V2Eq(m1.r0, m2.r0) && V2Eq(m1.r1, m2.r1); }
 
 static Mat2 M2Transpose(Mat2 m) {
     Mat2 result = {m.s00, m.s10, m.s01, m.s11};
     return result;
 }
 
-static Mat2 M2Diag(float s00, float s11)  {
+static Mat2 M2Diag(float s00, float s11) {
     Mat2 result;
     result.s00 = s00;
     result.s01 = 0.0f;
@@ -441,9 +499,7 @@ static Mat2 M2Inverse(Mat2 m) {
 }
 
 
-static Vec3 M3GetCol(Mat3 m, int i) {
-    return (Vec3){m.r0.values[i], m.r1.values[i], m.r2.values[i]};
-}
+static Vec3 M3GetCol(Mat3 m, int i) { return (Vec3){m.r0.values[i], m.r1.values[i], m.r2.values[i]}; }
 
 static Mat3 M3Neg(Mat3 m) {
     Mat3 result;
@@ -511,9 +567,7 @@ static Mat3 M3MulM3(Mat3 m1, Mat3 m2) {
 }
 
 
-static bool M3Eq(Mat3 m1, Mat3 m2) {
-    return V3Eq(m1.r0, m2.r0) && V3Eq(m1.r1, m2.r1) && V3Eq(m1.r2, m2.r2);
-}
+static bool M3Eq(Mat3 m1, Mat3 m2) { return V3Eq(m1.r0, m2.r0) && V3Eq(m1.r1, m2.r1) && V3Eq(m1.r2, m2.r2); }
 
 static Mat3 M3Transpose(Mat3 m) {
     Mat3 result = {};
@@ -523,21 +577,21 @@ static Mat3 M3Transpose(Mat3 m) {
     return result;
 }
 
-static Mat3 M3Diag(float s00, float s11, float s22)  {
+static Mat3 M3Diag(float s00, float s11, float s22) {
     Mat3 result;
-    
+
     result.s00 = s00;
     result.s01 = 0.f;
     result.s02 = 0.f;
-    
+
     result.s10 = 0.f;
     result.s11 = s11;
     result.s12 = 0.f;
-    
+
     result.s20 = 0.f;
     result.s21 = 0.f;
     result.s22 = s22;
-    
+
     return result;
 }
 
@@ -657,11 +711,11 @@ static Mat4 M4DivS(Mat4 m, float s) {
 }
 
 static Vec4 M4MulV4(Mat4 m, Vec4 v) {
-    Vec4 result = (Vec4){0.0f,0.0f,0.0f,0.0f};
+    Vec4 result = (Vec4){0.0f, 0.0f, 0.0f, 0.0f};
     // DONE?(student)
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            result.values[i]+=m.rows[i].values[j]*v.values[j];
+            result.values[i] += m.rows[i].values[j] * v.values[j];
         }
     }
     return result;
@@ -669,9 +723,11 @@ static Vec4 M4MulV4(Mat4 m, Vec4 v) {
 
 static Vec3 M4MulV3(Mat4 m, Vec3 v) {
     Vec4 u = M4MulV4(m, (Vec4){v.x, v.y, v.z, 1.f});
-    if(ABS(u.w) < EPSILON) return v;
-    
-    return (Vec3) {u.x/u.w, u.y/u.w, u.z/u.w};
+    if (ABS(u.w) < EPSILON) {
+        return v;
+    }
+
+    return (Vec3){u.x / u.w, u.y / u.w, u.z / u.w};
 }
 
 static Mat4 M4MulM4(Mat4 m1, Mat4 m2) {
@@ -681,7 +737,7 @@ static Mat4 M4MulM4(Mat4 m1, Mat4 m2) {
         for (int j = 0; j < 4; j++) {
             result.rows[i].values[j] = 0;
             for (int k = 0; k < 4; k++) {
-                result.rows[i].values[j] += m1.rows[i].values[k]*m2.rows[k].values[j];
+                result.rows[i].values[j] += m1.rows[i].values[k] * m2.rows[k].values[j];
             }
         }
     }
@@ -697,70 +753,63 @@ static Mat4 M4Transpose(Mat4 m) {
     // DONE?(student)
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            result.rows[j].values[i] = m.rows[i].values[j];//locality optimization?
+            result.rows[j].values[i] = m.rows[i].values[j]; //locality optimization?
         }
     }
     return result;
 }
 
-static Mat4 M4Diag(float s00, float s11, float s22, float s33)  {
+static Mat4 M4Diag(float s00, float s11, float s22, float s33) {
     Mat4 result;
-    
+
     result.s00 = s00;
     result.s01 = 0.f;
     result.s02 = 0.f;
     result.s03 = 0.f;
-    
+
     result.s10 = 0.f;
     result.s11 = s11;
     result.s12 = 0.f;
     result.s13 = 0.f;
-    
+
     result.s20 = 0.f;
     result.s21 = 0.f;
     result.s22 = s22;
     result.s23 = 0.f;
-    
+
     result.s30 = 0.f;
     result.s31 = 0.f;
     result.s32 = 0.f;
     result.s33 = s33;
-    
+
     return result;
 }
 
-static Mat4 M4DiagS(float s) {
-    return M4Diag(s, s, s, s);
-}
+static Mat4 M4DiagS(float s) { return M4Diag(s, s, s, s); }
 
 static float M4Det(Mat4 m) {
     float result = 0.f;
     // DONE?(student)
     // d_ij := determinant without columns i,j and without the first two rows
-    float d01 = 0.0f, d02 = 0.0f, d03 = 0.0f, d12 = 0.0f, d13 = 0.0f, d23=0.0f;
+    float d01 = 0.0f, d02 = 0.0f, d03 = 0.0f, d12 = 0.0f, d13 = 0.0f, d23 = 0.0f;
     d01 = m.s22 * m.s33 - m.s23 * m.s32;
     d02 = m.s21 * m.s33 - m.s23 * m.s31;
     d03 = m.s21 * m.s32 - m.s22 * m.s31;
     d12 = m.s20 * m.s33 - m.s23 * m.s30;
     d13 = m.s20 * m.s32 - m.s22 * m.s30;
     d23 = m.s20 * m.s31 - m.s21 * m.s30;
-    result = m.s00*(m.s11*d01-m.s12*d02+m.s13*d03)
-            -m.s01*(m.s10*d01-m.s12*d12+m.s13*d13)
-            +m.s02*(m.s10*d02-m.s11*d12+m.s13*d23)
-            -m.s03*(m.s10*d03-m.s11*d13+m.s12*d23);
+    result = m.s00 * (m.s11 * d01 - m.s12 * d02 + m.s13 * d03) - m.s01 * (m.s10 * d01 - m.s12 * d12 + m.s13 * d13) +
+        m.s02 * (m.s10 * d02 - m.s11 * d12 + m.s13 * d23) - m.s03 * (m.s10 * d03 - m.s11 * d13 + m.s12 * d23);
     return result;
 }
 
-static Mat3 M4toM3(Mat4 m){
+static Mat3 M4toM3(Mat4 m) {
     Mat3 result = {m.s00, m.s01, m.s02, m.s10, m.s11, m.s12, m.s20, m.s21, m.s22};
     return result;
 }
 
-static Mat4 M3toM4(Mat3 m){
-    Mat4 result = {m.s00, m.s01, m.s02, 0,
-                m.s10, m.s11, m.s12, 0,
-                m.s20, m.s21, m.s22, 0,
-                0, 0, 0, 1};
+static Mat4 M3toM4(Mat3 m) {
+    Mat4 result = {m.s00, m.s01, m.s02, 0, m.s10, m.s11, m.s12, 0, m.s20, m.s21, m.s22, 0, 0, 0, 0, 1};
     return result;
 }
 
@@ -778,17 +827,11 @@ static Mat4 M4RotateV(Vec3 source, Vec3 dest) {
     return result;
 }
 
-static Mat4 M4Scale(float x, float y, float z) {
-    return M4Diag(x, y, z, 1.f);
-}
+static Mat4 M4Scale(float x, float y, float z) { return M4Diag(x, y, z, 1.f); }
 
-static Mat4 M4ScaleV3(Vec3 v) {
-    return M4Scale(v.x, v.y, v.z);
-}
+static Mat4 M4ScaleV3(Vec3 v) { return M4Scale(v.x, v.y, v.z); }
 
-static Mat4 M4ScaleS(float s) {
-    return M4Scale(s, s, s);
-}
+static Mat4 M4ScaleS(float s) { return M4Scale(s, s, s); }
 
 static Mat4 M4Translate(Vec3 v) {
     Mat4 result = M4DiagS(1.f);
@@ -799,29 +842,51 @@ static Mat4 M4Translate(Vec3 v) {
     return result;
 }
 
-static Mat4 M4Identity() {
-    return M4ScaleS(1.f);
-}
+static Mat4 M4Identity() { return M4ScaleS(1.f); }
 
 // matrix taken from slide 15 in https://courses.grainger.illinois.edu/cs418/sp2018/slides/CS418-Lecture9-OrthoProjection.pdf
 // also found in slide 21 of https://odedstein.com/teaching/hs-2026-02360216/Tutorial03.pdf
 // I am a bit confused about the matrix M in some other slides (the one that sets z to zero)
 static Mat4 M4Orthographic(float left, float right, float bottom, float top, float zNear, float zFar) {
-    Mat4 result = {2/(right-left), 0, 0, -(right+left)/(right-left),
-                0, 2/(top-bottom), 0, -(top+bottom)/(top-bottom), 
-                0, 0, -2/(zFar - zNear), -(zFar+zNear)/(zFar-zNear),
-                0, 0, 0, 1};
+    Mat4 result = {2 / (right - left),
+                   0,
+                   0,
+                   -(right + left) / (right - left),
+                   0,
+                   2 / (top - bottom),
+                   0,
+                   -(top + bottom) / (top - bottom),
+                   0,
+                   0,
+                   -2 / (zFar - zNear),
+                   -(zFar + zNear) / (zFar - zNear),
+                   0,
+                   0,
+                   0,
+                   1};
     // DONE?(student)
     // TODO: add M that sets z=0 if doesn't work
     return result;
 }
 
-static Mat4 M4Frustum(float left, float right, float bottom, float top ,float zNear, float zFar){
+static Mat4 M4Frustum(float left, float right, float bottom, float top, float zNear, float zFar) {
     float dVrt = top - bottom, dHrz = right - left, dz = zFar - zNear;
-    Mat4 result = {2*zNear/dHrz, 0, (right+left)/dHrz, 0,
-                0, 2*zNear/dVrt, (top+bottom)/dVrt, 0,
-                0, 0, -(zFar+zNear)/dz, -2*zNear*zFar/dz,
-                0, 0, -1, 0};
+    Mat4 result = {2 * zNear / dHrz,
+                   0,
+                   (right + left) / dHrz,
+                   0,
+                   0,
+                   2 * zNear / dVrt,
+                   (top + bottom) / dVrt,
+                   0,
+                   0,
+                   0,
+                   -(zFar + zNear) / dz,
+                   -2 * zNear * zFar / dz,
+                   0,
+                   0,
+                   -1,
+                   0};
     //DONE?(now)
     return result;
 }
@@ -829,9 +894,9 @@ static Mat4 M4Frustum(float left, float right, float bottom, float top ,float zN
 // maybe a good source https://www.mathematik.uni-marburg.de/~thormae/lectures/graphics1/graphics_6_1_eng_web.html#19
 static Mat4 M4Perspective(float fov, float aspect, float zNear, float zFar) {
     float top, bottom, left, right;
-    top = zNear*tan(fov/2);
+    top = zNear * tan(fov / 2);
     bottom = -top;
-    right = top*aspect;
+    right = top * aspect;
     left = -right;
     Mat4 result = M4Frustum(left, right, bottom, top, zNear, zFar);
     // DONE?(student)
@@ -844,7 +909,7 @@ static Mat4 M4LookAt(Vec3 eye, Vec3 target, Vec3 up) {
     Vec3 u = V3Normalize(V3Cross(up, n));
     Vec3 v = V3Normalize(V3Cross(n, u));
     // DONE?(student)
-    return M4MulM4(M3toM4((Mat3){.r0=u,.r1=v,.r2=n}), M4Translate(V3Neg(eye)));
+    return M4MulM4(M3toM4((Mat3){.r0 = u, .r1 = v, .r2 = n}), M4Translate(V3Neg(eye)));
 }
 
 // Helper: Build 3x3 orientation basis from camera Euler angles (pitch = x, yaw = y, roll = z)
