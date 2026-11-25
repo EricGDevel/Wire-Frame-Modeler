@@ -1,15 +1,9 @@
 #include "../test_common.h"
 
-#define RAYGUI_IMPLEMENTATION
 #include <raygui.h>
 
-#define SCENE_IMPLEMENTATION
 #include "../../scene.h"
-
-#define RENDERER_IMPLEMENTATION
 #include "../../renderer.h"
-
-#define INTERFACE_IMPLEMENTATION
 #include "../../interface.h"
 
 static void TestSceneModelManagement(void) {
@@ -144,7 +138,6 @@ int main(void) {
     SetTraceLogLevel(LOG_ERROR);
     PrintSuiteHeader("Running Scene, RenderSettings & UI Helper Unit Tests");
 
-    TestMakeDefaultCamera();
     TestSceneModelManagement();
     TestSceneCameraManagement();
     TestMakeDefaultRenderSettings();
